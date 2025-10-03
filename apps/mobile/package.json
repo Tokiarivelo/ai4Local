@@ -1,0 +1,37 @@
+{
+  "name": "@ai4local/mobile",
+  "version": "1.0.0",
+  "description": "Application mobile AI4Local - React Native",
+  "private": true,
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build": "expo build",
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@ai4local/shared": "workspace:*",
+    "expo": "^49.0.0",
+    "react": "^18.2.0",
+    "react-native": "^0.72.0",
+    "@react-navigation/native": "^6.1.0",
+    "@react-navigation/bottom-tabs": "^6.5.0",
+    "@react-navigation/stack": "^6.3.0",
+    "expo-linear-gradient": "^12.3.0",
+    "expo-notifications": "^0.20.0",
+    "expo-secure-store": "^12.3.0",
+    "react-native-safe-area-context": "^4.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-native": "^0.72.0",
+    "typescript": "^5.2.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "jest": "^29.7.0"
+  }
+}

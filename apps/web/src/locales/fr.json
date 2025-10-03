@@ -1,0 +1,80 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "close": "Fermer"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "campaigns": "Campagnes",
+    "customers": "Clients",
+    "analytics": "Analyses",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "register": "S'inscrire",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "rememberMe": "Se souvenir de moi",
+    "loginSuccess": "Connexion réussie",
+    "logoutSuccess": "Déconnexion réussie",
+    "invalidCredentials": "Identifiants invalides"
+  },
+  "dashboard": {
+    "welcome": "Bienvenue sur AI4Local",
+    "overview": "Aperçu",
+    "recentActivity": "Activité récente",
+    "statistics": "Statistiques",
+    "quickActions": "Actions rapides"
+  },
+  "campaigns": {
+    "title": "Campagnes Marketing",
+    "create": "Créer une campagne",
+    "name": "Nom de la campagne",
+    "description": "Description",
+    "status": "Statut",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "budget": "Budget",
+    "target": "Cible",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "draft": "Brouillon",
+    "completed": "Terminé"
+  },
+  "customers": {
+    "title": "Gestion des Clients",
+    "create": "Ajouter un client",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "company": "Entreprise",
+    "totalCustomers": "Total des clients",
+    "activeCustomers": "Clients actifs"
+  },
+  "metadata": {
+    "title": "AI4Local - Plateforme Marketing pour PME",
+    "description": "Plateforme marketing IA pour les PME malgaches. Créez des campagnes, gérez vos clients et acceptez les paiements mobiles."
+  }
+}

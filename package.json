@@ -1,0 +1,61 @@
+{
+  "name": "ai4local-monorepo",
+  "version": "1.0.0",
+  "description": "Marketing Digital par IA pour PME Malgaches",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "shared"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "scripts": {
+    "turbo:build": "turbo run build",
+    "turbo:dev": "turbo run dev",
+    "turbo:lint": "turbo run lint",
+    "turbo:test": "turbo run test",
+    "dev": "bun run dev:all",
+    "dev:all": "concurrently \"bun run dev:web\" \"bun run dev:mobile\" \"bun run dev:api\"",
+    "dev:web": "cd apps/web && bun run dev",
+    "dev:mobile": "cd apps/mobile && bun run start",
+    "dev:api": "cd services/api-gateway && bun run start:dev",
+    "build": "bun run build:shared && bun run build:services && bun run build:apps",
+    "build:shared": "cd shared && bun run build",
+    "build:services": "concurrently \"cd services/api-gateway && bun run build\" \"cd services/ai-content-service && cargo build --release\" \"cd services/ml-service && pip install -r requirements.txt\"",
+    "build:apps": "concurrently \"cd apps/web && bun run build\" \"cd apps/mobile && bun run build\"",
+    "test": "bun run test:all",
+    "test:all": "concurrently \"bun run test:services\" \"bun run test:apps\"",
+    "test:services": "cd services/api-gateway && bun run test",
+    "test:apps": "cd apps/web && bun run test",
+    "lint": "bun run lint:all",
+    "lint:all": "concurrently \"bun run lint:services\" \"bun run lint:apps\"",
+    "lint:services": "cd services/api-gateway && bun run lint",
+    "lint:apps": "cd apps/web && bun run lint",
+    "docker:dev": "docker-compose -f infra/docker-compose.dev.yml up -d",
+    "docker:prod": "docker-compose -f infra/docker-compose.prod.yml up -d",
+    "k8s:dev": "skaffold dev",
+    "k8s:deploy": "helm upgrade --install ai4local infra/helm/ai4local",
+    "migration:up": "cd services/api-gateway && bun run migration:up",
+    "migration:down": "cd services/api-gateway && bun run migration:down"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.19",
+    "concurrently": "^8.2.2",
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "ai",
+    "marketing",
+    "madagascar",
+    "pme",
+    "saas",
+    "mobile-money"
+  ],
+  "author": "AI4Local Team",
+  "license": "PROPRIETARY",
+  "packageManager": "bun@1.2.0"
+}

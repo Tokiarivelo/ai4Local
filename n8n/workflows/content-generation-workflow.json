@@ -1,0 +1,131 @@
+{
+  "name": "AI4Local n8n Workflows",
+  "version": "1.0.0",
+  "description": "Workflows d'automatisation pour AI4Local",
+  "nodes": [
+    {
+      "id": "webhook-content-request",
+      "name": "Webhook - Demande de contenu",
+      "type": "n8n-nodes-base.webhook",
+      "position": [200, 300],
+      "parameters": {
+        "path": "content-request",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "ai-content-generation",
+      "name": "Génération contenu IA",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [400, 300],
+      "parameters": {
+        "url": "http://ai-content-service:8080/api/v1/content/generate",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "prompt": "={{$json.prompt}}",
+          "content_type": "={{$json.content_type}}",
+          "language": "={{$json.language}}",
+          "company_id": "={{$json.company_id}}"
+        }
+      }
+    },
+    {
+      "id": "ml-analysis",
+      "name": "Analyse ML",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [600, 300],
+      "parameters": {
+        "url": "http://ml-service:5000/api/v1/analyze",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "text": "={{$json.content}}",
+          "language": "={{$json.language}}",
+          "analysis_type": "sentiment"
+        }
+      }
+    },
+    {
+      "id": "save-to-database",
+      "name": "Sauvegarde BDD",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [800, 300],
+      "parameters": {
+        "url": "http://api-gateway:4000/graphql",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "query": "mutation { saveContent(input: {id: \"{{$json.id}}\", content: \"{{$json.content}}\", analysis: \"{{$json.analysis}}\"}) { id success } }"
+        }
+      }
+    },
+    {
+      "id": "notification",
+      "name": "Notification utilisateur",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1000, 300],
+      "parameters": {
+        "url": "http://api-gateway:4000/graphql",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "query": "mutation { sendNotification(userId: \"{{$json.userId}}\", message: \"Votre contenu est prêt!\") { success } }"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "webhook-content-request": {
+      "main": [
+        [
+          {
+            "node": "ai-content-generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ai-content-generation": {
+      "main": [
+        [
+          {
+            "node": "ml-analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ml-analysis": {
+      "main": [
+        [
+          {
+            "node": "save-to-database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save-to-database": {
+      "main": [
+        [
+          {
+            "node": "notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "error-handler-workflow"
+  },
+  "tags": ["ai4local", "content-generation", "mvp"]
+}

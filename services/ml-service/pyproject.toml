@@ -1,0 +1,60 @@
+name = "ml-service"
+version = "1.0.0"
+description = "Service ML pour NLP français/malgache"
+dependencies = [
+    "fastapi==0.104.1",
+    "uvicorn==0.24.0",
+    "pydantic==2.5.0",
+    "scikit-learn==1.3.2",
+    "xgboost==2.0.1",
+    "pandas==2.1.4",
+    "numpy==1.24.4",
+    "nltk==3.8.1",
+    "spacy==3.7.2",
+    "transformers==4.36.0",
+    "torch==2.1.1",
+    "redis==5.0.1",
+    "motor==3.3.2",
+    "aiohttp==3.9.1",
+    "python-multipart==0.0.6",
+    "python-dotenv==1.0.0",
+    "loguru==0.7.2",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "ml-service"
+version = "1.0.0"
+description = "Service ML pour traitement de langage naturel FR/MG"
+authors = ["AI4Local Team"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.1"
+uvicorn = "^0.24.0"
+pydantic = "^2.5.0"
+scikit-learn = "^1.3.2"
+xgboost = "^2.0.1"
+pandas = "^2.1.4"
+numpy = "^1.24.4"
+nltk = "^3.8.1"
+spacy = "^3.7.2"
+transformers = "^4.36.0"
+torch = "^2.1.1"
+redis = "^5.0.1"
+motor = "^3.3.2"
+aiohttp = "^3.9.1"
+python-multipart = "^0.0.6"
+python-dotenv = "^1.0.0"
+loguru = "^0.7.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-asyncio = "^0.21.1"
+black = "^23.11.0"
+isort = "^5.12.0"
+flake8 = "^6.1.0"
+mypy = "^1.7.1"

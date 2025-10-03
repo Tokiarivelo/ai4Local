@@ -1,0 +1,175 @@
+version: '3.8'
+
+services:
+  # Base de données MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: ai4local-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ai4local2025
+      MONGO_INITDB_DATABASE: ai4local
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - ai4local-network
+
+  # Base de données PostgreSQL pour données relationnelles
+  postgres:
+    image: postgres:16
+    container_name: ai4local-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ai4local
+      POSTGRES_PASSWORD: ai4local2025
+      POSTGRES_DB: ai4local_relational
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ai4local-network
+
+  # Cache Redis
+  redis:
+    image: redis:7.2-alpine
+    container_name: ai4local-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ai4local2025
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ai4local-network
+
+  # API Gateway (NestJS)
+  api-gateway:
+    build:
+      context: ../services/api-gateway
+      dockerfile: Dockerfile
+    container_name: ai4local-api-gateway
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      MONGODB_URI: mongodb://admin:ai4local2025@mongodb:27017/ai4local?authSource=admin
+      POSTGRES_URI: postgresql://ai4local:ai4local2025@postgres:5432/ai4local_relational
+      REDIS_URI: redis://:ai4local2025@redis:6379
+      JWT_SECRET: ai4local-jwt-secret-dev
+      AI_CONTENT_SERVICE_URL: http://ai-content-service:8080
+      ML_SERVICE_URL: http://ml-service:5000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongodb
+      - postgres
+      - redis
+    networks:
+      - ai4local-network
+    volumes:
+      - ../services/api-gateway:/app
+      - /app/node_modules
+
+  # Service de contenu IA (Rust)
+  ai-content-service:
+    build:
+      context: ../services/ai-content-service
+      dockerfile: Dockerfile
+    container_name: ai4local-ai-content
+    restart: unless-stopped
+    environment:
+      RUST_LOG: info
+      PORT: 8080
+      MONGODB_URI: mongodb://admin:ai4local2025@mongodb:27017/ai4local?authSource=admin
+      REDIS_URI: redis://:ai4local2025@redis:6379
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - ai4local-network
+
+  # Service ML (Python)
+  ml-service:
+    build:
+      context: ../services/ml-service
+      dockerfile: Dockerfile
+    container_name: ai4local-ml-service
+    restart: unless-stopped
+    environment:
+      ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:ai4local2025@mongodb:27017/ai4local?authSource=admin
+      REDIS_URI: redis://:ai4local2025@redis:6379
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - ai4local-network
+    volumes:
+      - ../services/ml-service:/app
+      - ml_models:/app/models
+
+  # n8n pour workflows
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ai4local-n8n
+    restart: unless-stopped
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: true
+      N8N_BASIC_AUTH_USER: admin
+      N8N_BASIC_AUTH_PASSWORD: ai4local2025
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://localhost:5678
+      GENERIC_TIMEZONE: Indian/Antananarivo
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ../n8n/workflows:/home/node/.n8n/workflows
+    networks:
+      - ai4local-network
+
+  # Application Web (Next.js)
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile.dev
+    container_name: ai4local-web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_GRAPHQL_URL: http://localhost:4000/graphql
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - ai4local-network
+    volumes:
+      - ../apps/web:/app
+      - /app/node_modules
+      - /app/.next
+
+volumes:
+  mongodb_data:
+  postgres_data:
+  redis_data:
+  n8n_data:
+  ml_models:
+
+networks:
+  ai4local-network:
+    driver: bridge

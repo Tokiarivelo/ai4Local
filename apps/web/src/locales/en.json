@@ -1,0 +1,80 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "campaigns": "Campaigns",
+    "customers": "Customers",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "invalidCredentials": "Invalid credentials"
+  },
+  "dashboard": {
+    "welcome": "Welcome to AI4Local",
+    "overview": "Overview",
+    "recentActivity": "Recent Activity",
+    "statistics": "Statistics",
+    "quickActions": "Quick Actions"
+  },
+  "campaigns": {
+    "title": "Marketing Campaigns",
+    "create": "Create Campaign",
+    "name": "Campaign Name",
+    "description": "Description",
+    "status": "Status",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "budget": "Budget",
+    "target": "Target",
+    "active": "Active",
+    "inactive": "Inactive",
+    "draft": "Draft",
+    "completed": "Completed"
+  },
+  "customers": {
+    "title": "Customer Management",
+    "create": "Add Customer",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "company": "Company",
+    "totalCustomers": "Total Customers",
+    "activeCustomers": "Active Customers"
+  },
+  "metadata": {
+    "title": "AI4Local - Marketing Platform for SMEs",
+    "description": "AI marketing platform for Malagasy SMEs. Create campaigns, manage customers and accept mobile payments."
+  }
+}

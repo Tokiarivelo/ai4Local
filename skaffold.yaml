@@ -1,0 +1,98 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: ai4local
+
+# Configuration des builds
+build:
+  artifacts:
+    - image: ai4local/api-gateway
+      context: services/api-gateway
+      docker:
+        dockerfile: Dockerfile
+    - image: ai4local/ai-content-service
+      context: services/ai-content-service
+      docker:
+        dockerfile: Dockerfile
+    - image: ai4local/ml-service
+      context: services/ml-service
+      docker:
+        dockerfile: Dockerfile
+    - image: ai4local/web
+      context: apps/web
+      docker:
+        dockerfile: Dockerfile
+
+# Configuration des déploiements
+deploy:
+  helm:
+    releases:
+      - name: ai4local
+        chartPath: infra/helm/ai4local
+        valuesFiles:
+          - infra/helm/ai4local/values-dev.yaml
+        setValues:
+          image.repository: ai4local
+          image.tag: latest
+        wait: true
+
+# Configuration du développement local
+dev:
+  - image: ai4local/api-gateway
+    context: services/api-gateway
+    sync:
+      manual:
+        - src: 'src/**/*.ts'
+          dest: /app/src
+    portForward:
+      - resourceType: service
+        resourceName: ai4local-api-gateway
+        port: 4000
+        localPort: 4000
+
+  - image: ai4local/web
+    context: apps/web
+    sync:
+      manual:
+        - src: 'src/**/*'
+          dest: /app/src
+    portForward:
+      - resourceType: service
+        resourceName: ai4local-web
+        port: 3000
+        localPort: 3000
+
+# Profils d'environnement
+profiles:
+  - name: development
+    activation:
+      - env: ENVIRONMENT=dev
+    deploy:
+      helm:
+        releases:
+          - name: ai4local
+            chartPath: infra/helm/ai4local
+            valuesFiles:
+              - infra/helm/ai4local/values-dev.yaml
+
+  - name: staging
+    activation:
+      - env: ENVIRONMENT=staging
+    deploy:
+      helm:
+        releases:
+          - name: ai4local
+            chartPath: infra/helm/ai4local
+            valuesFiles:
+              - infra/helm/ai4local/values-staging.yaml
+
+  - name: production
+    activation:
+      - env: ENVIRONMENT=prod
+    deploy:
+      helm:
+        releases:
+          - name: ai4local
+            chartPath: infra/helm/ai4local
+            valuesFiles:
+              - infra/helm/ai4local/values-prod.yaml
