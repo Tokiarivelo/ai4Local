@@ -270,7 +270,7 @@ export default function DashboardPage() {
               <div className='space-y-3'>
                 {recentActivities.map((activity, index) => (
                   <div key={index} className='flex items-start space-x-3'>
-                    <div className='w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0' />
+                    <div className='w-2 h-2 bg-primary rounded-full mt-2 shrink-0' />
                     <div className='space-y-1 min-w-0 flex-1'>
                       <p className='text-sm font-medium leading-none'>
                         {activity.action}

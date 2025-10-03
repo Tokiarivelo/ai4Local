@@ -20,7 +20,7 @@ function Header({ onMenuToggle, isMenuOpen }: { onMenuToggle: () => void; isMenu
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
+            <div className="shrink-0 flex items-center">
               <Sparkles className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">AI4Local</span>
             </div>
@@ -103,7 +103,7 @@ function Header({ onMenuToggle, isMenuOpen }: { onMenuToggle: () => void; isMenu
 // Composant Hero Section
 function HeroSection() {
   return (
-    <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white">
+    <section className="bg-linear-to-br from-blue-600 via-purple-600 to-blue-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">

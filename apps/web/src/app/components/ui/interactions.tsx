@@ -209,7 +209,7 @@ export function CommandPalette({
                       className='w-full flex items-center px-2 py-2 text-sm rounded-md hover:bg-accent transition-colors text-left'
                     >
                       {item.icon && (
-                        <span className='mr-3 flex-shrink-0'>{item.icon}</span>
+                        <span className='mr-3 shrink-0'>{item.icon}</span>
                       )}
                       <div className='flex-1 min-w-0'>
                         <div className='font-medium'>{item.label}</div>
@@ -259,7 +259,7 @@ export function Toast({ title, description, type, onClose }: ToastProps) {
       )}
     >
       <div className='flex items-start'>
-        <span className='text-lg mr-3 flex-shrink-0'>{icons[type]}</span>
+        <span className='text-lg mr-3 shrink-0'>{icons[type]}</span>
         <div className='flex-1 min-w-0'>
           <h4 className='font-medium text-sm'>{title}</h4>
           {description && (

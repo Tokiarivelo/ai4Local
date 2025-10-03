@@ -253,7 +253,7 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
       <div className='flex items-center justify-between p-4 border-b border-sidebar-border'>
         {!collapsed && (
           <div className='flex items-center'>
-            <div className='w-8 h-8 bg-gradient-to-br from-sidebar-primary to-sidebar-accent rounded-lg flex items-center justify-center'>
+            <div className='w-8 h-8 bg-linear-to-br from-sidebar-primary to-sidebar-accent rounded-lg flex items-center justify-center'>
               <span className='font-bold text-white text-sm'>AI</span>
             </div>
             <span className='ml-2 text-lg font-bold text-sidebar-foreground'>

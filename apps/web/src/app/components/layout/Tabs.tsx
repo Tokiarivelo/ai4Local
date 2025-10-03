@@ -193,15 +193,15 @@ export function QuickFilterTabs({
 }: QuickFilterTabsProps) {
   const colorVariants = {
     default:
-      'text-muted-foreground border-transparent hover:text-foreground data-[active]:text-foreground data-[active]:border-border',
+      'text-muted-foreground border-transparent hover:text-foreground data-active:text-foreground data-active:border-border',
     primary:
-      'text-primary border-primary/20 hover:border-primary/40 data-[active]:border-primary',
+      'text-primary border-primary/20 hover:border-primary/40 data-active:border-primary',
     success:
-      'text-green-600 border-green-200 hover:border-green-300 data-[active]:border-green-500',
+      'text-green-600 border-green-200 hover:border-green-300 data-active:border-green-500',
     warning:
-      'text-yellow-600 border-yellow-200 hover:border-yellow-300 data-[active]:border-yellow-500',
+      'text-yellow-600 border-yellow-200 hover:border-yellow-300 data-active:border-yellow-500',
     destructive:
-      'text-red-600 border-red-200 hover:border-red-300 data-[active]:border-red-500',
+      'text-red-600 border-red-200 hover:border-red-300 data-active:border-red-500',
   };
 
   return (
@@ -218,7 +218,7 @@ export function QuickFilterTabs({
         >
           <span>{filter.label}</span>
           {filter.count !== undefined && (
-            <span className='bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full min-w-[1.5rem] text-center'>
+            <span className='bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full min-w-6 text-center'>
               {filter.count}
             </span>
           )}

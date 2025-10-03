@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -14,7 +14,22 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@ai4local/shared/*": ["./shared/src/*"],
+      "@ai4local/types": ["./shared/src/types"],
+      "@ai4local/utils": ["./shared/src/utils"],
+      "@ai4local/graphql": ["./shared/src/graphql"]
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["node_modules", ".next", "dist", "build"]
+  "include": ["apps/**/*", "services/**/*", "shared/**/*", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist", "build", ".next", "target"]
 }

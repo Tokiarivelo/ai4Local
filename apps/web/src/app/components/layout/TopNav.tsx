@@ -87,7 +87,7 @@ export function TopNav({
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 w-full bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-border',
+        'sticky top-0 z-40 w-full bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60 border-b border-border',
         className
       )}
     >
@@ -97,7 +97,7 @@ export function TopNav({
           {/* Compact logo for collapsed sidebar */}
           {sidebarCollapsed && (
             <div className='flex items-center'>
-              <div className='w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center'>
+              <div className='w-8 h-8 bg-linear-to-br from-primary to-accent rounded-lg flex items-center justify-center'>
                 <span className='font-bold text-white text-sm'>AI</span>
               </div>
               <span className='ml-2 text-lg font-bold text-foreground hidden sm:block'>
