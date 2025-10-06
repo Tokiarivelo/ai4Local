@@ -25,7 +25,8 @@
     "analytics": "Analyses",
     "settings": "Paramètres",
     "profile": "Profil",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "formation": "Formation"
   },
   "auth": {
     "login": "Se connecter",

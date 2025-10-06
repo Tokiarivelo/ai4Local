@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { DollarSign, Eye, MousePointer, Target } from 'lucide-react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { QuickFilterTabs } from '@/components/layout/Tabs';
 import { AnalyticsHeader } from '@/components/analytics/AnalyticsHeader';
@@ -30,11 +29,12 @@ const performanceData = [
   { month: 'Dec', campaigns: 31, openRate: 34.2, clickRate: 6.1, revenue: 35400 },
 ];
 
+// Couleurs adaptées au thème avec CSS variables
 const channelData = [
-  { name: 'Email', value: 65, color: '#1F6CC5' },
-  { name: 'SMS', value: 20, color: '#63B3ED' },
-  { name: 'Push', value: 10, color: '#A7D8F9' },
-  { name: 'Social', value: 5, color: '#0A4595' },
+  { name: 'Email', value: 65, color: 'var(--primary)' },
+  { name: 'SMS', value: 20, color: 'var(--chart-1)' },
+  { name: 'Push', value: 10, color: 'var(--chart-2)' },
+  { name: 'Social', value: 5, color: 'var(--chart-3)' },
 ];
 
 const funnelData = [
@@ -106,62 +106,85 @@ export default function AnalyticsPage() {
     { id: 'year', label: 'Cette année', count: 0 },
   ];
 
-  const handleSelectPeriod = () => {
+  const handleSelectPeriod = (): void => {
     console.log('Sélection de période');
   };
 
-  const handleAdvancedFilters = () => {
+  const handleAdvancedFilters = (): void => {
     console.log('Filtres avancés');
   };
 
-  const handleExport = () => {
+  const handleExport = (): void => {
     console.log('Export des données');
   };
 
-  const handleViewAllCampaigns = () => {
+  const handleViewAllCampaigns = (): void => {
     console.log('Voir toutes les campagnes');
   };
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Navigation */}
+      <div className="px-1">
         <Breadcrumbs items={[{ label: 'Analytics' }]} />
+      </div>
 
+      {/* Header */}
+      <div className="px-1">
         <AnalyticsHeader
           onSelectPeriod={handleSelectPeriod}
           onAdvancedFilters={handleAdvancedFilters}
           onExport={handleExport}
         />
+      </div>
 
+      {/* Filtres période */}
+      <div className="px-1">
         <QuickFilterTabs
           filters={periodFilters}
           activeFilter={activePeriod}
           onFilterChange={setActivePeriod}
         />
+      </div>
 
-        {/* KPI Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
-            <KPICard key={index} {...stat} />
-          ))}
-        </div>
+      {/* KPI Cards - Responsive grid */}
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4 px-1">
+        {stats.map((stat, index) => (
+          <KPICard key={index} {...stat} />
+        ))}
+      </div>
 
-        {/* Performance Overview */}
-        <div className="grid gap-6 lg:grid-cols-2">
+      {/* Performance Overview - Pleine largeur sur mobile */}
+      <div className="px-1">
+        <div className="grid gap-4 sm:gap-6">
           <PerformanceChart data={performanceData} />
         </div>
+      </div>
 
-        {/* Charts Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <ChannelDistributionChart data={channelData} />
-          <RevenueChart data={performanceData} />
-          <ConversionFunnel data={funnelData} />
+      {/* Charts Grid - Responsive layout */}
+      <div className="px-1">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
+          <div className="lg:col-span-1">
+            <ChannelDistributionChart data={channelData} />
+          </div>
+          <div className="lg:col-span-1">
+            <RevenueChart data={performanceData} />
+          </div>
+          <div className="lg:col-span-1">
+            <ConversionFunnel data={funnelData} />
+          </div>
         </div>
+      </div>
 
+      {/* Cohort Analysis - Scroll horizontal sur mobile */}
+      <div className="px-1">
         <CohortAnalysis data={cohortData} />
+      </div>
 
+      {/* Top Campaigns */}
+      <div className="px-1">
         <TopCampaigns campaigns={topCampaigns} onViewAll={handleViewAllCampaigns} />
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

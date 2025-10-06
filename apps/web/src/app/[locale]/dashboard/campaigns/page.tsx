@@ -1,28 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  Plus,
-  Filter,
-  Download,
-  Edit,
-  Copy,
-  Play,
-  Pause,
-  Trash2,
-} from 'lucide-react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Plus, Filter, Download, Edit, Copy, Play, Pause, Trash2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { QuickFilterTabs } from '@/components/layout/Tabs';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Campaign,
-  TableColumn,
-  TableAction,
-  BulkAction,
-} from '@/types/dashboard';
+import { Campaign, TableColumn, TableAction, BulkAction } from '@/types/dashboard';
 
 // Données exemple
 const mockCampaigns: Campaign[] = [
@@ -144,7 +129,7 @@ const getTypeBadge = (type: Campaign['type']) => {
 
   const variant = variants[type];
   return (
-    <Badge variant='outline' className={variant.className}>
+    <Badge variant="outline" className={variant.className}>
       {variant.label}
     </Badge>
   );
@@ -180,13 +165,11 @@ export default function CampaignsPage() {
       label: 'Campagne',
       sortable: true,
       render: (value, row) => (
-        <div className='space-y-1'>
-          <div className='font-medium'>{value}</div>
-          <div className='flex items-center space-x-2'>
+        <div className="space-y-1">
+          <div className="font-medium">{value}</div>
+          <div className="flex items-center space-x-2">
             {getTypeBadge(row.type)}
-            <span className='text-xs text-muted-foreground'>
-              par {row.createdBy}
-            </span>
+            <span className="text-xs text-muted-foreground">par {row.createdBy}</span>
           </div>
         </div>
       ),
@@ -201,9 +184,7 @@ export default function CampaignsPage() {
       key: 'audience',
       label: 'Audience',
       sortable: true,
-      render: (value) => (
-        <span className='font-medium'>{value?.toLocaleString()}</span>
-      ),
+      render: (value) => <span className="font-medium">{value?.toLocaleString()}</span>,
     },
     {
       key: 'openRate',
@@ -211,9 +192,9 @@ export default function CampaignsPage() {
       sortable: true,
       render: (value) =>
         value !== undefined ? (
-          <span className='font-medium'>{value}%</span>
+          <span className="font-medium">{value}%</span>
         ) : (
-          <span className='text-muted-foreground'>-</span>
+          <span className="text-muted-foreground">-</span>
         ),
     },
     {
@@ -222,9 +203,9 @@ export default function CampaignsPage() {
       sortable: true,
       render: (value) =>
         value !== undefined ? (
-          <span className='font-medium'>{value}%</span>
+          <span className="font-medium">{value}%</span>
         ) : (
-          <span className='text-muted-foreground'>-</span>
+          <span className="text-muted-foreground">-</span>
         ),
     },
     {
@@ -232,37 +213,68 @@ export default function CampaignsPage() {
       label: 'Dernière modification',
       sortable: true,
       render: (value) => (
-        <span className='text-sm text-muted-foreground'>
+        <span className="text-sm text-muted-foreground">
           {new Date(value).toLocaleDateString('fr-FR')}
         </span>
       ),
     },
   ];
 
+  interface EditAction extends TableAction<Campaign> {
+    label: string;
+    icon: 'Edit';
+    onClick: (campaign: Campaign) => void;
+    hidden: (campaign: Campaign) => boolean;
+  }
+
+  interface DuplicateAction extends TableAction<Campaign> {
+    label: string;
+    icon: 'Copy';
+    onClick: (campaign: Campaign) => void;
+  }
+
+  interface ToggleAction extends TableAction<Campaign> {
+    dynamicLabel: (campaign: Campaign) => string;
+    dynamicIcon: (campaign: Campaign) => 'Pause' | 'Play';
+    onClick: (campaign: Campaign) => void;
+    hidden: (campaign: Campaign) => boolean;
+  }
+
+  interface DeleteAction extends TableAction<Campaign> {
+    label: string;
+    icon: 'Trash2';
+    onClick: (campaign: Campaign) => void;
+    variant: 'destructive';
+  }
+
   const actions: TableAction<Campaign>[] = [
     {
       label: 'Modifier',
       icon: 'Edit',
-      onClick: (campaign) => console.log('Edit', campaign),
-      hidden: (campaign) => campaign.status === 'completed',
+      onClick: (campaign: Campaign) => console.log('Edit', campaign),
+      hidden: (campaign: Campaign) => campaign.status === 'completed',
     },
     {
       label: 'Dupliquer',
       icon: 'Copy',
-      onClick: (campaign) => console.log('Duplicate', campaign),
+      onClick: (campaign: Campaign) => console.log('Duplicate', campaign),
     },
+    // Toggle action : on va générer dynamiquement label et icon dans DataTable via renderAction
     {
-      label: (campaign) =>
-        campaign.status === 'active' ? 'Mettre en pause' : 'Activer',
-      icon: (campaign) => (campaign.status === 'active' ? 'Pause' : 'Play'),
-      onClick: (campaign) => console.log('Toggle', campaign),
-      hidden: (campaign) =>
+      label: '', // sera remplacé dynamiquement
+      icon: 'Pause', // valeur par défaut, remplacée dynamiquement
+      onClick: (campaign: Campaign) => console.log('Toggle', campaign),
+      hidden: (campaign: Campaign) =>
         campaign.status === 'completed' || campaign.status === 'draft',
-    },
+      // Ajout de propriétés personnalisées pour usage dans DataTable
+      dynamicLabel: (campaign: Campaign) =>
+        campaign.status === 'active' ? 'Mettre en pause' : 'Activer',
+      dynamicIcon: (campaign: Campaign) => (campaign.status === 'active' ? 'Pause' : 'Play'),
+    } as ToggleAction as TableAction<Campaign>,
     {
       label: 'Supprimer',
       icon: 'Trash2',
-      onClick: (campaign) => console.log('Delete', campaign),
+      onClick: (campaign: Campaign) => console.log('Delete', campaign),
       variant: 'destructive',
     },
   ];
@@ -322,69 +334,64 @@ export default function CampaignsPage() {
   ];
 
   return (
-    <DashboardLayout>
-      <div className='space-y-6'>
-        {/* Breadcrumbs */}
-        <Breadcrumbs items={[{ label: 'Campagnes' }]} />
+    <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={[{ label: 'Campagnes' }]} />
 
-        {/* Header */}
-        <div className='flex items-center justify-between'>
-          <div>
-            <h1 className='text-3xl font-bold tracking-tight'>Campagnes</h1>
-            <p className='text-muted-foreground'>
-              Gérez toutes vos campagnes marketing
-            </p>
-          </div>
-          <div className='flex items-center space-x-2'>
-            <Button variant='outline'>
-              <Filter className='w-4 h-4 mr-2' />
-              Filtres avancés
-            </Button>
-            <Button variant='outline'>
-              <Download className='w-4 h-4 mr-2' />
-              Exporter
-            </Button>
-            <Button>
-              <Plus className='w-4 h-4 mr-2' />
-              Nouvelle campagne
-            </Button>
-          </div>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Campagnes</h1>
+          <p className="text-muted-foreground">Gérez toutes vos campagnes marketing</p>
         </div>
-
-        {/* Quick filters */}
-        <QuickFilterTabs
-          filters={quickFilters}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
-
-        {/* Data table */}
-        <DataTable
-          data={filteredCampaigns}
-          columns={columns}
-          actions={actions}
-          bulkActions={bulkActions}
-          selection={{
-            selected: selectedCampaigns,
-            onSelect: setSelectedCampaigns,
-            getRowId: (campaign) => campaign.id,
-          }}
-          sorting={{
-            column: sortConfig.column,
-            direction: sortConfig.direction,
-            onSort: (column, direction) => setSortConfig({ column, direction }),
-          }}
-          pagination={{
-            page: 1,
-            pageSize: 10,
-            total: filteredCampaigns.length,
-            onPageChange: (page) => console.log('Page change', page),
-            onPageSizeChange: (pageSize) =>
-              console.log('Page size change', pageSize),
-          }}
-          emptyMessage='Aucune campagne trouvée pour ce filtre'
-        />
+        <div className="flex items-center space-x-2">
+          <Button variant="outline">
+            <Filter className="w-4 h-4 mr-2" />
+            Filtres avancés
+          </Button>
+          <Button variant="outline">
+            <Download className="w-4 h-4 mr-2" />
+            Exporter
+          </Button>
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Nouvelle campagne
+          </Button>
+        </div>
       </div>
-    </DashboardLayout>
+
+      {/* Quick filters */}
+      <QuickFilterTabs
+        filters={quickFilters}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
+
+      {/* Data table */}
+      <DataTable
+        data={filteredCampaigns}
+        columns={columns}
+        actions={actions}
+        bulkActions={bulkActions}
+        selection={{
+          selected: selectedCampaigns,
+          onSelect: setSelectedCampaigns,
+          getRowId: (campaign) => campaign.id,
+        }}
+        sorting={{
+          column: sortConfig.column,
+          direction: sortConfig.direction,
+          onSort: (column, direction) => setSortConfig({ column, direction }),
+        }}
+        pagination={{
+          page: 1,
+          pageSize: 10,
+          total: filteredCampaigns.length,
+          onPageChange: (page) => console.log('Page change', page),
+          onPageSizeChange: (pageSize) => console.log('Page size change', pageSize),
+        }}
+        emptyMessage="Aucune campagne trouvée pour ce filtre"
+      />
+    </div>
   );
 }

@@ -5,6 +5,7 @@ import { Search, Plus, Bell, ChevronDown, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,74 +88,81 @@ export function TopNav({
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 w-full bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60 border-b border-border',
+        'sticky top-0 z-40 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b border-border',
         className
       )}
     >
-      <div className='flex items-center justify-between h-16 px-4'>
+      <div className="flex items-center justify-between h-16 px-4">
         {/* Left section */}
-        <div className='flex items-center space-x-4'>
+        <div className="flex items-center space-x-4">
           {/* Compact logo for collapsed sidebar */}
           {sidebarCollapsed && (
-            <div className='flex items-center'>
-              <div className='w-8 h-8 bg-linear-to-br from-primary to-accent rounded-lg flex items-center justify-center'>
-                <span className='font-bold text-white text-sm'>AI</span>
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+                <span className="font-bold text-primary-foreground text-sm">AI</span>
               </div>
-              <span className='ml-2 text-lg font-bold text-foreground hidden sm:block'>
+              <span className="ml-2 text-lg font-bold text-foreground hidden sm:block">
                 AI4Local
               </span>
             </div>
           )}
 
           {/* Global search */}
-          <form onSubmit={handleSearch} className='relative w-64 sm:w-80'>
-            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4' />
+          <form onSubmit={handleSearch} className="relative w-64 sm:w-80">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              type='search'
-              placeholder='Rechercher campagnes, clients, contenus...'
+              type="search"
+              placeholder="Rechercher campagnes, clients, contenus..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className='pl-10 pr-4 w-full'
-              aria-label='Recherche globale'
+              className="pl-10 pr-4 w-full"
+              aria-label="Recherche globale"
             />
-            <kbd className='absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded hidden sm:inline-block'>
+            <kbd className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded hidden sm:inline-block">
               Ctrl K
             </kbd>
           </form>
         </div>
 
         {/* Right section */}
-        <div className='flex items-center space-x-2'>
+        <div className="flex items-center space-x-2">
+          {/* Theme Toggle - responsive positioning */}
+          <div className="hidden md:block">
+            <ThemeToggle
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 hover:bg-accent hover:text-accent-foreground"
+            />
+          </div>
+
           {/* New button */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className='bg-primary text-primary-foreground hover:bg-primary/90'>
-                <Plus className='w-4 h-4 mr-2' />
-                <span className='hidden sm:inline'>Nouveau</span>
-                <ChevronDown className='w-4 h-4 ml-2' />
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Nouveau</span>
+                <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-64'>
+            <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuLabel>Créer</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {newActions.map((action, index) => (
                 <DropdownMenuItem
                   key={index}
                   onClick={action.action}
-                  className='flex flex-col items-start space-y-1 py-3'
+                  className="flex flex-col items-start space-y-1 py-3"
                 >
-                  <div className='flex items-center justify-between w-full'>
-                    <span className='font-medium'>{action.label}</span>
+                  <div className="flex items-center justify-between w-full">
+                    <span className="font-medium">{action.label}</span>
                     {action.shortcut && (
-                      <kbd className='text-xs bg-muted px-1.5 py-0.5 rounded'>
+                      <kbd className="text-xs bg-muted px-1.5 py-0.5 rounded">
                         {action.shortcut}
                       </kbd>
                     )}
                   </div>
                   {action.description && (
-                    <span className='text-sm text-muted-foreground'>
-                      {action.description}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{action.description}</span>
                   )}
                 </DropdownMenuItem>
               ))}
@@ -164,50 +172,40 @@ export function TopNav({
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='sm' className='relative'>
-                <Bell className='w-5 h-5' />
+              <Button variant="ghost" size="sm" className="relative h-9 w-9">
+                <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
                   <Badge
-                    variant='destructive'
-                    className='absolute -top-1 -right-1 w-5 h-5 text-xs p-0 flex items-center justify-center'
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 w-5 h-5 text-xs p-0 flex items-center justify-center"
                   >
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </Badge>
                 )}
-                <span className='sr-only'>
-                  {unreadCount > 0
-                    ? `${unreadCount} notifications non lues`
-                    : 'Notifications'}
+                <span className="sr-only">
+                  {unreadCount > 0 ? `${unreadCount} notifications non lues` : 'Notifications'}
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-80'>
-              <DropdownMenuLabel className='flex items-center justify-between'>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel className="flex items-center justify-between">
                 Notifications
-                {unreadCount > 0 && (
-                  <Badge variant='secondary'>{unreadCount} nouvelles</Badge>
-                )}
+                {unreadCount > 0 && <Badge variant="secondary">{unreadCount} nouvelles</Badge>}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <div className='max-h-64 overflow-y-auto'>
+              <div className="max-h-64 overflow-y-auto">
                 {notifications.length > 0 ? (
                   notifications.slice(0, 5).map((notification) => (
                     <DropdownMenuItem
                       key={notification.id}
-                      className='flex flex-col items-start space-y-1 py-3'
+                      className="flex flex-col items-start space-y-1 py-3"
                     >
-                      <div className='flex items-center justify-between w-full'>
-                        <span className='font-medium text-sm'>
-                          {notification.title}
-                        </span>
-                        {notification.unread && (
-                          <div className='w-2 h-2 bg-primary rounded-full' />
-                        )}
+                      <div className="flex items-center justify-between w-full">
+                        <span className="font-medium text-sm">{notification.title}</span>
+                        {notification.unread && <div className="w-2 h-2 bg-primary rounded-full" />}
                       </div>
-                      <span className='text-sm text-muted-foreground'>
-                        {notification.message}
-                      </span>
-                      <span className='text-xs text-muted-foreground'>
+                      <span className="text-sm text-muted-foreground">{notification.message}</span>
+                      <span className="text-xs text-muted-foreground">
                         {notification.timestamp.toLocaleDateString('fr-FR', {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -216,7 +214,7 @@ export function TopNav({
                     </DropdownMenuItem>
                   ))
                 ) : (
-                  <div className='p-4 text-center text-muted-foreground text-sm'>
+                  <div className="p-4 text-center text-muted-foreground text-sm">
                     Aucune notification
                   </div>
                 )}
@@ -224,7 +222,7 @@ export function TopNav({
               {notifications.length > 5 && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className='text-center text-sm text-primary'>
+                  <DropdownMenuItem className="text-center text-sm text-primary">
                     Voir toutes les notifications
                   </DropdownMenuItem>
                 </>
@@ -235,51 +233,51 @@ export function TopNav({
           {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant='ghost'
-                className='flex items-center space-x-2 pl-2'
-              >
-                <div className='w-8 h-8 bg-muted rounded-full flex items-center justify-center'>
+              <Button variant="ghost" className="flex items-center space-x-2 pl-2">
+                <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
                   {user?.avatar ? (
                     <img
                       src={user.avatar}
                       alt={user.name}
-                      className='w-8 h-8 rounded-full object-cover'
+                      className="w-8 h-8 rounded-full object-cover"
                     />
                   ) : (
-                    <User className='w-4 h-4' />
+                    <User className="w-4 h-4" />
                   )}
                 </div>
-                <div className='hidden sm:block text-left'>
-                  <div className='text-sm font-medium'>
-                    {user?.name || 'Utilisateur'}
-                  </div>
-                  <div className='text-xs text-muted-foreground'>
-                    {user?.role || 'Rôle'}
-                  </div>
+                <div className="hidden sm:block text-left">
+                  <div className="text-sm font-medium">{user?.name || 'Utilisateur'}</div>
+                  <div className="text-xs text-muted-foreground">{user?.role || 'Rôle'}</div>
                 </div>
-                <ChevronDown className='w-4 h-4' />
+                <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-48'>
+            <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>
-                <div className='flex flex-col space-y-1'>
-                  <span className='font-medium'>
-                    {user?.name || 'Utilisateur'}
-                  </span>
-                  <span className='text-xs font-normal text-muted-foreground'>
+                <div className="flex flex-col space-y-1">
+                  <span className="font-medium">{user?.name || 'Utilisateur'}</span>
+                  <span className="text-xs font-normal text-muted-foreground">
                     {user?.email || 'email@example.com'}
                   </span>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+
+              {/* Theme toggle dans le menu utilisateur pour mobile */}
+              <div className="md:hidden">
+                <DropdownMenuItem className="flex items-center justify-between p-2">
+                  <span>Thème</span>
+                  <ThemeToggle variant="ghost" size="sm" className="h-8 w-8" />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </div>
+
               {userMenuItems.map((item, index) => (
                 <DropdownMenuItem
                   key={index}
                   onClick={item.action}
                   className={cn(
-                    item.variant === 'destructive' &&
-                      'text-destructive focus:text-destructive'
+                    item.variant === 'destructive' && 'text-destructive focus:text-destructive'
                   )}
                 >
                   {item.label}

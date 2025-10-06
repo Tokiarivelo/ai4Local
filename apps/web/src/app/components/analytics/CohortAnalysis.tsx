@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface CohortData {
   cohort: string;
@@ -16,75 +17,91 @@ interface CohortData {
 interface CohortAnalysisProps {
   data: CohortData[];
   title?: string;
+  className?: string;
 }
 
 export function CohortAnalysis({
   data,
   title = 'Analyse de cohortes - Rétention (%)',
+  className,
 }: CohortAnalysisProps) {
-  const getCellStyle = (value: number, monthIndex: number) => {
-    if (value === 0) return {};
+  const getIntensityColor = (value: number): string => {
+    if (value === 0) return 'transparent';
 
-    const cssVariables = [
-      '--ai4local-primary',
-      '--ai4local-accent',
-      '--ai4local-secondary',
-      '--ai4local-highlight',
-      '--ai4local-primary',
-      '--ai4local-accent',
-    ];
+    // Calcul de l'intensité basé sur la valeur (0-100)
+    const intensity = Math.max(0.1, value / 100);
+    return `hsl(var(--color-primary) / ${intensity})`;
+  };
 
-    return {
-      backgroundColor: `hsl(var(${cssVariables[monthIndex]}, ${value}%))`,
-    };
+  const getTextColor = (value: number): string => {
+    return value > 50 ? 'hsl(var(--color-primary-foreground))' : 'hsl(var(--color-foreground))';
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
+    <Card className={cn('bg-card text-card-foreground border-border', className)}>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-lg font-semibold text-foreground">{title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left p-2">Cohorte</th>
-                <th className="text-center p-2">M1</th>
-                <th className="text-center p-2">M2</th>
-                <th className="text-center p-2">M3</th>
-                <th className="text-center p-2">M4</th>
-                <th className="text-center p-2">M5</th>
-                <th className="text-center p-2">M6</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((cohort, index) => (
-                <tr key={index} className="border-b">
-                  <td className="p-2 font-medium">{cohort.cohort}</td>
-                  <td className="text-center p-2">
-                    <div className="w-12 h-6 bg-primary rounded mx-auto flex items-center justify-center text-white text-xs">
-                      {cohort.month1}%
-                    </div>
-                  </td>
-                  {[cohort.month2, cohort.month3, cohort.month4, cohort.month5, cohort.month6].map(
-                    (value, monthIndex) => (
-                      <td key={monthIndex + 1} className="text-center p-2">
-                        {value > 0 && (
+      <CardContent className="p-0">
+        <div className="responsive-scroll">
+          <div className="min-w-[600px] p-4">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left p-3 font-medium text-muted-foreground">Cohorte</th>
+                  {['M1', 'M2', 'M3', 'M4', 'M5', 'M6'].map((month) => (
+                    <th key={month} className="text-center p-3 font-medium text-muted-foreground">
+                      {month}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((cohort, index) => (
+                  <tr key={index} className="border-b border-border last:border-b-0">
+                    <td className="p-3 font-medium text-foreground">{cohort.cohort}</td>
+                    <td className="text-center p-3">
+                      <div
+                        className="w-12 h-8 rounded mx-auto flex items-center justify-center text-xs font-medium"
+                        style={{
+                          backgroundColor: 'hsl(var(--color-primary))',
+                          color: 'hsl(var(--color-primary-foreground))',
+                        }}
+                      >
+                        {cohort.month1}%
+                      </div>
+                    </td>
+                    {[
+                      cohort.month2,
+                      cohort.month3,
+                      cohort.month4,
+                      cohort.month5,
+                      cohort.month6,
+                    ].map((value, monthIndex) => (
+                      <td key={monthIndex + 1} className="text-center p-3">
+                        {value > 0 ? (
                           <div
-                            className="w-12 h-6 rounded mx-auto flex items-center justify-center text-white text-xs"
-                            style={getCellStyle(value, monthIndex + 1)}
+                            className="w-12 h-8 rounded mx-auto flex items-center justify-center text-xs font-medium transition-all duration-200 hover:scale-105"
+                            style={{
+                              backgroundColor: getIntensityColor(value),
+                              color: getTextColor(value),
+                              border: value > 0 ? '1px solid hsl(var(--color-border))' : 'none',
+                            }}
                           >
                             {value}%
                           </div>
+                        ) : (
+                          <div className="w-12 h-8 mx-auto flex items-center justify-center">
+                            <span className="text-muted-foreground text-xs">-</span>
+                          </div>
                         )}
                       </td>
-                    )
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </CardContent>
     </Card>

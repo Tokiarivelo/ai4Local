@@ -74,6 +74,7 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+  --chart-stroke: oklch(47.682% 0.00773 17.044);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -84,6 +85,30 @@
   --sidebar-ring: oklch(0.708 0 0);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+
+  /* Variables de base */
+  --color-background: 0 0% 100%;
+  --color-foreground: 224 71% 4%;
+  --color-card: 0 0% 100%;
+  --color-card-foreground: 224 71% 4%;
+  --color-popover: 0 0% 100%;
+  --color-popover-foreground: 224 71% 4%;
+  --color-primary: 220 98% 61%;
+  --color-primary-foreground: 210 20% 98%;
+  --color-secondary: 220 15% 95%;
+  --color-secondary-foreground: 220 9% 46%;
+  --color-muted: 220 15% 95%;
+  --color-muted-foreground: 220 9% 46%;
+  --color-accent: 220 15% 95%;
+  --color-accent-foreground: 220 9% 46%;
+  --color-destructive: 0 84% 60%;
+  --color-destructive-foreground: 210 20% 98%;
+  --color-border: 220 13% 91%;
+  --color-input: 220 13% 91%;
+  --color-ring: 224 71% 4%;
+  --color-success: 142 76% 36%;
+  --color-warning: 38 92% 50%;
+  --color-error: 0 84% 60%;
 }
 
 .dark {
@@ -110,6 +135,7 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+  --chart-stroke: oklch(33.24% 0.00998 17.458);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -118,6 +144,30 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Mode sombre */
+  --color-background: 224 71% 4%;
+  --color-foreground: 210 20% 98%;
+  --color-card: 224 71% 4%;
+  --color-card-foreground: 210 20% 98%;
+  --color-popover: 224 71% 4%;
+  --color-popover-foreground: 210 20% 98%;
+  --color-primary: 217 91% 60%;
+  --color-primary-foreground: 222 84% 5%;
+  --color-secondary: 215 28% 17%;
+  --color-secondary-foreground: 210 20% 98%;
+  --color-muted: 215 28% 17%;
+  --color-muted-foreground: 217 11% 65%;
+  --color-accent: 215 28% 17%;
+  --color-accent-foreground: 210 20% 98%;
+  --color-destructive: 0 63% 31%;
+  --color-destructive-foreground: 210 20% 98%;
+  --color-border: 215 28% 17%;
+  --color-input: 215 28% 17%;
+  --color-ring: 216 12% 84%;
+  --color-success: 142 71% 45%;
+  --color-warning: 38 95% 56%;
+  --color-error: 0 91% 71%;
 }
 
 @layer base {
@@ -126,5 +176,28 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* custom utility pour scroll horizontal fin */
+@layer utilities {
+  .responsive-scroll {
+    overflow-x: auto;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: hsl(var(--color-muted)) transparent; /* Firefox */
+  }
+
+  /* WebKit scrollbars (Chrome, Safari, Edge) — on cible la classe, pas le nom utility */
+  .responsive-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .responsive-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .responsive-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--color-muted));
+    border-radius: 2px;
   }
 }

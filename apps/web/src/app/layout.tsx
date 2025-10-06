@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Providers } from './providers/providers';
 
 // Metadata for the root layout
 export const metadata: Metadata = {
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 // This layout only handles non-localized routes
 // The middleware will redirect all traffic to /[locale]
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <Providers>{children}</Providers>;
 }

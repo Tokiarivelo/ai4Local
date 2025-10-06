@@ -14,6 +14,7 @@ import {
   ComposedChart,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface PerformanceData {
   month: string;
@@ -26,49 +27,79 @@ interface PerformanceData {
 interface PerformanceChartProps {
   data: PerformanceData[];
   title?: string;
+  className?: string;
 }
 
 export function PerformanceChart({
   data,
   title = "Performance sur l'année",
+  className,
 }: PerformanceChartProps) {
   return (
-    <Card className="lg:col-span-2">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
+    <Card className={cn('bg-card text-card-foreground border-border', className)}>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-lg font-semibold text-foreground">{title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="h-80">
+      <CardContent className="p-4">
+        <div className="h-64 sm:h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
+            <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--color-border))"
+                opacity={0.3}
+              />
+              <XAxis
+                dataKey="month"
+                tick={{ fill: 'hsl(var(--color-muted-foreground))', fontSize: 12 }}
+                axisLine={{ stroke: 'hsl(var(--color-border))' }}
+              />
+              <YAxis
+                yAxisId="left"
+                tick={{ fill: 'hsl(var(--color-muted-foreground))', fontSize: 12 }}
+                axisLine={{ stroke: 'hsl(var(--color-border))' }}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                tick={{ fill: 'hsl(var(--color-muted-foreground))', fontSize: 12 }}
+                axisLine={{ stroke: 'hsl(var(--color-border))' }}
+              />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px',
+                  backgroundColor: 'hsl(var(--color-card))',
+                  border: '1px solid hsl(var(--color-border))',
+                  borderRadius: '8px',
+                  color: 'hsl(var(--color-card-foreground))',
+                  fontSize: '14px',
                 }}
+                labelStyle={{ color: 'hsl(var(--color-foreground))' }}
               />
-              <Legend />
-              <Bar yAxisId="left" dataKey="campaigns" fill="#63B3ED" name="Campagnes" />
+              <Legend wrapperStyle={{ color: 'hsl(var(--color-foreground))' }} />
+              <Bar
+                yAxisId="left"
+                dataKey="campaigns"
+                fill="hsl(var(--color-chart-1))"
+                name="Campagnes"
+                radius={[2, 2, 0, 0]}
+              />
               <Line
                 yAxisId="right"
                 type="monotone"
                 dataKey="openRate"
-                stroke="#1F6CC5"
+                stroke="hsl(var(--color-primary))"
                 strokeWidth={2}
                 name="Taux d'ouverture %"
+                dot={{ fill: 'hsl(var(--color-primary))', strokeWidth: 2, r: 4 }}
               />
               <Line
                 yAxisId="right"
                 type="monotone"
                 dataKey="clickRate"
-                stroke="#0A4595"
+                stroke="hsl(var(--color-chart-2))"
                 strokeWidth={2}
                 name="Taux de clic %"
+                dot={{ fill: 'hsl(var(--color-chart-2))', strokeWidth: 2, r: 4 }}
               />
             </ComposedChart>
           </ResponsiveContainer>

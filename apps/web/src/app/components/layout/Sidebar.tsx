@@ -44,15 +44,10 @@ import {
   LinkIcon,
   Webhook,
 } from 'lucide-react';
-import { navigationItems, filterNavigationByRole } from '@/config/navigation';
+import { navigationItems, filterNavigationByRole } from '@/config/dashboard-navigation';
 import { NavigationItem, UserRole } from '@/types/dashboard';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 
 interface SidebarProps {
@@ -118,9 +113,7 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) =>
-      prev.includes(itemId)
-        ? prev.filter((id) => id !== itemId)
-        : [...prev, itemId]
+      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
     );
   };
 
@@ -129,10 +122,7 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
     return item.children?.some((child) => child.href === pathname) ?? false;
   };
 
-  const renderIcon = (
-    iconName: string | undefined,
-    className: string = 'w-5 h-5'
-  ) => {
+  const renderIcon = (iconName: string | undefined, className: string = 'w-5 h-5') => {
     if (!iconName) return null;
     const Icon = iconMap[iconName];
     return Icon ? <Icon className={className} /> : null;
@@ -145,17 +135,15 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
 
     const itemContent = (
       <>
-        <div className='flex items-center flex-1 min-w-0'>
-          <div className='flex items-center justify-center w-8 h-8 mr-3'>
+        <div className="flex items-center flex-1 min-w-0">
+          <div className="flex items-center justify-center w-8 h-8 mr-3">
             {renderIcon(item.icon)}
           </div>
           {!collapsed && (
             <>
-              <span className='font-medium text-sm truncate flex-1'>
-                {item.label}
-              </span>
+              <span className="font-medium text-sm truncate flex-1">{item.label}</span>
               {item.badge && (
-                <Badge variant='secondary' className='ml-2 text-xs'>
+                <Badge variant="secondary" className="ml-2 text-xs">
                   {item.badge}
                 </Badge>
               )}
@@ -163,11 +151,11 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
           )}
         </div>
         {!collapsed && hasChildren && (
-          <div className='ml-2'>
+          <div className="ml-2">
             {isExpanded ? (
-              <ChevronDown className='w-4 h-4' />
+              <ChevronDown className="w-4 h-4" />
             ) : (
-              <ChevronRight className='w-4 h-4' />
+              <ChevronRight className="w-4 h-4" />
             )}
           </div>
         )}
@@ -186,7 +174,7 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
     const itemElement =
       hasChildren || !item.href ? (
         <Button
-          variant='ghost'
+          variant="ghost"
           className={buttonClass}
           onClick={() => hasChildren && toggleExpanded(item.id)}
           aria-expanded={hasChildren ? isExpanded : undefined}
@@ -201,12 +189,12 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
       );
 
     return (
-      <div key={item.id} className='space-y-1'>
+      <div key={item.id} className="space-y-1">
         {collapsed && item.icon ? (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>{itemElement}</TooltipTrigger>
-              <TooltipContent side='right'>
+              <TooltipContent side="right">
                 <p>{item.label}</p>
               </TooltipContent>
             </Tooltip>
@@ -216,7 +204,7 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
         )}
 
         {!collapsed && hasChildren && isExpanded && (
-          <div className='ml-4 space-y-1 border-l border-sidebar-border pl-4'>
+          <div className="ml-4 space-y-1 border-l border-sidebar-border pl-4">
             {item.children?.map((child) => (
               <Link
                 key={child.id}
@@ -230,12 +218,12 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
                     : 'text-sidebar-foreground'
                 )}
               >
-                <div className='flex items-center justify-center w-6 h-6 mr-3'>
+                <div className="flex items-center justify-center w-6 h-6 mr-3">
                   {renderIcon(child.icon, 'w-4 h-4')}
                 </div>
-                <span className='truncate'>{child.label}</span>
+                <span className="truncate">{child.label}</span>
                 {child.badge && (
-                  <Badge variant='secondary' className='ml-auto text-xs'>
+                  <Badge variant="secondary" className="ml-auto text-xs">
                     {child.badge}
                   </Badge>
                 )}
@@ -248,52 +236,50 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
   };
 
   const sidebarContent = (
-    <div className='flex flex-col h-full'>
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className='flex items-center justify-between p-4 border-b border-sidebar-border'>
+      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         {!collapsed && (
-          <div className='flex items-center'>
-            <div className='w-8 h-8 bg-linear-to-br from-sidebar-primary to-sidebar-accent rounded-lg flex items-center justify-center'>
-              <span className='font-bold text-white text-sm'>AI</span>
+          <div className="flex items-center">
+            <div className="w-8 h-8 bg-linear-to-br from-sidebar-primary to-sidebar-accent rounded-lg flex items-center justify-center">
+              <span className="font-bold text-white text-sm">AI</span>
             </div>
-            <span className='ml-2 text-lg font-bold text-sidebar-foreground'>
-              AI4Local
-            </span>
+            <span className="ml-2 text-lg font-bold text-sidebar-foreground">AI4Local</span>
           </div>
         )}
         <Button
-          variant='ghost'
-          size='sm'
+          variant="ghost"
+          size="sm"
           onClick={() => setCollapsed(!collapsed)}
-          className='w-8 h-8 p-0 text-sidebar-foreground hover:bg-sidebar-accent lg:flex hidden'
+          className="w-8 h-8 p-0 text-sidebar-foreground hover:bg-sidebar-accent lg:flex hidden"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          <Menu className='w-4 h-4' />
+          <Menu className="w-4 h-4" />
         </Button>
         <Button
-          variant='ghost'
-          size='sm'
+          variant="ghost"
+          size="sm"
           onClick={() => setMobileOpen(false)}
-          className='w-8 h-8 p-0 text-sidebar-foreground hover:bg-sidebar-accent lg:hidden'
-          aria-label='Close sidebar'
+          className="w-8 h-8 p-0 text-sidebar-foreground hover:bg-sidebar-accent lg:hidden"
+          aria-label="Close sidebar"
         >
-          <X className='w-4 h-4' />
+          <X className="w-4 h-4" />
         </Button>
       </div>
 
       {/* Navigation */}
       <nav
-        className='flex-1 p-4 space-y-2 overflow-y-auto'
-        role='navigation'
-        aria-label='Main navigation'
+        className="flex-1 p-4 space-y-2 overflow-y-auto"
+        role="navigation"
+        aria-label="Main navigation"
       >
         {filteredNavigation.map((item) => renderNavigationItem(item))}
       </nav>
 
       {/* Footer */}
-      <div className='p-4 border-t border-sidebar-border'>
+      <div className="p-4 border-t border-sidebar-border">
         {!collapsed && (
-          <div className='text-xs text-sidebar-foreground/70 text-center'>
+          <div className="text-xs text-sidebar-foreground/70 text-center">
             <p>AI4Local Dashboard</p>
             <p>v1.0.0</p>
           </div>
@@ -307,21 +293,21 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
       {/* Mobile backdrop */}
       {mobileOpen && (
         <div
-          className='fixed inset-0 z-40 bg-black/50 lg:hidden'
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setMobileOpen(false)}
-          aria-hidden='true'
+          aria-hidden="true"
         />
       )}
 
       {/* Mobile toggle button */}
       <Button
-        variant='ghost'
-        size='sm'
+        variant="ghost"
+        size="sm"
         onClick={() => setMobileOpen(true)}
-        className='fixed top-4 left-4 z-50 w-10 h-10 p-0 bg-sidebar lg:hidden'
-        aria-label='Open sidebar'
+        className="fixed top-4 left-4 z-50 w-10 h-10 p-0 bg-sidebar lg:hidden"
+        aria-label="Open sidebar"
       >
-        <Menu className='w-5 h-5 text-sidebar-foreground' />
+        <Menu className="w-5 h-5 text-sidebar-foreground" />
       </Button>
 
       {/* Desktop sidebar */}
@@ -331,7 +317,7 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
           collapsed ? 'w-16' : 'w-64',
           className
         )}
-        aria-label='Sidebar navigation'
+        aria-label="Sidebar navigation"
       >
         {sidebarContent}
       </aside>
@@ -342,7 +328,7 @@ export function Sidebar({ userRole = 'Admin', className }: SidebarProps) {
           'fixed left-0 top-0 z-50 h-screen w-64 bg-sidebar transform transition-transform duration-300 ease-in-out lg:hidden',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
-        aria-label='Mobile sidebar navigation'
+        aria-label="Mobile sidebar navigation"
       >
         {sidebarContent}
       </aside>

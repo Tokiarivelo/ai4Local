@@ -1,10 +1,10 @@
 'use client';
 
 import { NextUIProvider } from '@nextui-org/react';
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { ApolloProvider } from '@apollo/client';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { apolloClient } from '../lib/apollo';
+import { apolloClient } from '../../lib/apollo';
+import { ThemeProvider } from './theme-provider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,11 +20,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ApolloProvider client={apolloClient}>
       <QueryClientProvider client={queryClient}>
-        <NextUIProvider>
-          <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
-            {children}
-          </NextThemesProvider>
-        </NextUIProvider>
+        <ThemeProvider>
+          <NextUIProvider>{children}</NextUIProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </ApolloProvider>
   );

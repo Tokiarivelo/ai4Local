@@ -24,7 +24,7 @@ export function DashboardLayout({
   className,
 }: DashboardLayoutProps) {
   return (
-    <div className='min-h-screen bg-background'>
+    <div className="min-h-screen bg-background">
       {/* Sidebar */}
       <Sidebar userRole={userRole} />
 
@@ -45,8 +45,7 @@ export function DashboardLayout({
             {
               id: '1',
               title: 'Campagne terminée',
-              message:
-                'La campagne "Promo été 2024" s\'est terminée avec succès',
+              message: 'La campagne "Promo été 2024" s\'est terminée avec succès',
               type: 'success',
               unread: true,
               timestamp: new Date(),
@@ -54,8 +53,7 @@ export function DashboardLayout({
             {
               id: '2',
               title: 'Faible engagement',
-              message:
-                'La campagne "Newsletter hebdo" a un taux d\'ouverture de 8%',
+              message: 'La campagne "Newsletter hebdo" a un taux d\'ouverture de 8%',
               type: 'warning',
               unread: true,
               timestamp: new Date(),
