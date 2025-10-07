@@ -2,16 +2,16 @@
 
 import React, { useState } from 'react';
 import { DollarSign, Eye, MousePointer, Target } from 'lucide-react';
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
-import { QuickFilterTabs } from '@/components/layout/Tabs';
-import { AnalyticsHeader } from '@/components/analytics/AnalyticsHeader';
-import { KPICard } from '@/components/analytics/KPICard';
-import { PerformanceChart } from '@/components/analytics/PerformanceChart';
-import { ChannelDistributionChart } from '@/components/analytics/ChannelDistributionChart';
-import { RevenueChart } from '@/components/analytics/RevenueChart';
-import { ConversionFunnel } from '@/components/analytics/ConversionFunnel';
-import { CohortAnalysis } from '@/components/analytics/CohortAnalysis';
-import { TopCampaigns } from '@/components/analytics/TopCampaigns';
+import { Breadcrumbs } from '@/app/modules/dashboard/layout/Breadcrumbs';
+import { QuickFilterTabs } from '@/app/modules/dashboard/layout/Tabs';
+import { AnalyticsHeader } from '@/app/modules/dashboard/analytics/AnalyticsHeader';
+import { KPICard } from '@/app/modules/dashboard/analytics/KPICard';
+import { PerformanceChart } from '@/app/modules/dashboard/analytics/PerformanceChart';
+import { ChannelDistributionChart } from '@/app/modules/dashboard/analytics/ChannelDistributionChart';
+import { RevenueChart } from '@/app/modules/dashboard/analytics/RevenueChart';
+import { ConversionFunnel } from '@/app/modules/dashboard/analytics/ConversionFunnel';
+import { CohortAnalysis } from '@/app/modules/dashboard/analytics/CohortAnalysis';
+import { TopCampaigns } from '@/app/modules/dashboard/analytics/TopCampaigns';
 
 // Données exemple (à déplacer vers un service ou hook plus tard)
 const performanceData = [

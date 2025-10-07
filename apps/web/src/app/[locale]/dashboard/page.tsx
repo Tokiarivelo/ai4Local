@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { DashboardOverview } from '@/components/dashboard';
+import { DashboardOverview } from '@/app/modules/dashboard/welcome';
 
 /**
  * Page principale du tableau de bord

@@ -1,4 +1,4 @@
-import DashboardLayout from '@/app/components/layout/DashboardLayout';
+import DashboardLayout from '@/app/modules/dashboard/layout/DashboardLayout';
 import type { Metadata } from 'next';
 
 // Metadata for the root layout

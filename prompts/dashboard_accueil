@@ -1,0 +1,58 @@
+Génère la page **Accueil (Realtime)** pour l’application AI4Local.
+
+Contexte / exigences globales :
+
+- Mobile-first, responsive (breakpoints sm/md/lg/xl). Sidebar collapsible sur desktop et drawer sur mobile.
+- Support _Dark Mode_ + _Light Mode_ (prévoir variables CSS et classes `dark:` Tailwind).
+- Typage strict TypeScript (props + interfaces).
+- Composants réutilisables attendus : `KpiCard`, `LineChart`, `BarChart`, `ActivityFeed`, `RealtimeControls`, `FiltersDrawer`, `SkeletonLoader`.
+- Accessibilité (aria-labels, focus states, keyboard navigation).
+- Chargement / skeletons et états empty / error.
+- Tests d’exportation simple (ex: storybook-ready props examples).
+
+Page **Accueil / Realtime** — structure & contenu :
+
+1. `RealtimeLayout` (page wrapper)
+   - Header: global search, date range quick selector, dark mode toggle, user avatar.
+   - Breadcrumbs: "Accueil / Realtime".
+2. `HeroKpis` (ligne responsive de KPI cards)
+   - KPI examples: `Campagnes actives`, `Impressions (24h)`, `Engagement rate`, `Conversions (24h)`.
+   - Chaque `KpiCard` doit accepter props: `{ title: string; value: string|number; delta?: number; sparklineData?: number[]; icon?: ReactNode }`.
+3. `RealtimeCharts` (principale zone graphique)
+   - Chart 1: `LineChart` (visitors / engagements over time) — interactive tooltip, zoom range, series colors: primary = --brand-mid, secondary = --brand-light.
+   - Chart 2: `BarChart` (conversions by channel) — stacked bars, responsive.
+   - Chart area must gracefully collapse to a single column on mobile.
+4. `ActivityFeed` (colonne droite ou section dessous sur mobile)
+   - Stream d’événements en temps réel (publishing, erreurs, validations) avec timestamp relatif (ex: "il y a 2 min") et badge status.
+   - Actions rapides sur chaque item (Voir, Annuler, Marquer lu) via kebab menu.
+5. `RealtimeControls` (toolbar sticky)
+   - Boutons: Pause/Resume realtime (toggle), Refresh now, Export CSV.
+   - Date range picker (last 30m / 1h / 24h / custom).
+   - Switch live playback speed (1x, 2x) — accessible via keyboard.
+6. `FiltersDrawer` (drawer / panel)
+   - Filtres : Channels (Facebook, WhatsApp, Instagram), Status (Active, Scheduled, Failed), Tags, Owners.
+   - Bulk apply & clear filters.
+7. `HelpCard` (bottom / side)
+   - Mini-guide: "Que signifie chaque KPI" + CTA "Voir la doc" (ouvrir modal).
+
+Comportements & interactions :
+
+- Realtime updates simulated via mocked websocket prop `onMessage` (ex: `useEffect` mock emitting events) — le code doit prévoir l’API `subscribeToRealtime(callback)` pour brancher de vrai WS.
+- Smooth transitions (fade/slide) pour nouveaux items dans `ActivityFeed`.
+- Charts interactive : hover tooltips, legend toggle series.
+- Dark mode: backgrounds, borders, shadows et charts adaptés (use CSS variables).
+- Performance : virtualization pour feed long (ex: react-window) et debounce pour filtres/search.
+
+Livrables demandés :
+
+- Ensemble de fichiers TSX dans `app/components/...` avec exports index.
+- `types.ts` contenant toutes les interfaces/ types partagés.
+- `README.md` court expliquant comment intégrer la page (props requis, points d’extension).
+- Exemples d’utilisation dans `examples/RealtimeExample.tsx` qui monte la page avec données mock.
+- Coupe mobile + desktop (commentaires sur breakpoints utilisés).
+
+Contraintes finales (bref) :
+
+- Code propre, bien commenté, DRY, functions et composants petits et testables.
+- Respecte la palette et le mode sombre/clair.
+- Fournis skeletons pour chaque module et états error/empty.

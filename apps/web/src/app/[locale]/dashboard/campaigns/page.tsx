@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { Plus, Filter, Download, Edit, Copy, Play, Pause, Trash2 } from 'lucide-react';
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
-import { QuickFilterTabs } from '@/components/layout/Tabs';
-import { DataTable } from '@/components/ui/data-table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Breadcrumbs } from '@/app/modules/dashboard/layout/Breadcrumbs';
+import { QuickFilterTabs } from '@/app/modules/dashboard/layout/Tabs';
+import { DataTable } from '@/app/modules/ui/data-table';
+import { Button } from '@/app/modules/ui/button';
+import { Badge } from '@/app/modules/ui/badge';
 import { Campaign, TableColumn, TableAction, BulkAction } from '@/types/dashboard';
 
 // Données exemple

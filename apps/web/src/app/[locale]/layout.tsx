@@ -45,13 +45,5 @@ export default async function LocaleLayout({
 
   const messages = await getMessages();
 
-  return (
-    <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
-  );
+  return <div> {children}</div>;
 }

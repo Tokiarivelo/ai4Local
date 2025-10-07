@@ -2,11 +2,11 @@
 
 import { ThemeProvider } from 'next-themes';
 import { useState } from 'react';
-import { Header } from '../components/home/layout/header';
-import { HeroSection } from '../components/home/modules/hero-section';
-import { FeaturesSection } from '../components/home/modules/features-section';
-import { Footer } from '../components/home/layout/footer';
-import { CTASection } from '../components/home/modules/cta-section';
+import { Header } from '../modules/home/layout/header';
+import { HeroSection } from '../modules/home/modules/hero-section';
+import { FeaturesSection } from '../modules/home/modules/features-section';
+import { Footer } from '../modules/home/layout/footer';
+import { CTASection } from '../modules/home/modules/cta-section';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
