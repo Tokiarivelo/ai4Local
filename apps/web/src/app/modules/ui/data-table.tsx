@@ -171,9 +171,7 @@ export function DataTable<T>({
                   <th className="w-10 p-4">
                     <Checkbox
                       checked={isAllSelected}
-                      ref={(el) => {
-                        if (el) el.indeterminate = isIndeterminate;
-                      }}
+                      indeterminate={isIndeterminate}
                       onCheckedChange={handleSelectAll}
                       aria-label="Sélectionner tout"
                     />

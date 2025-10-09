@@ -1,0 +1,66 @@
+Génère la page **Accueil / Notifications** pour l’application AI4Local.  
+Contrainte : tout le code livré doit être en **TypeScript** et placé sous `app/components` (structure modulaire). Respecte l’App Router Next.js (Next 15), Tailwind CSS et l’usage de Bun pour les scripts. Fournis uniquement fichiers TSX/TS + README + mocks.
+
+PALETTE (tokens Tailwind / variables CSS)
+
+- --brand-dark: #0A4595
+- --brand-mid: #1F6CC5
+- --brand-light:#63B3ED
+- --brand-ghost:#A7D8F9
+- --bg: #FFFFFF
+- --text: #0F172A
+
+OBJECTIFS
+
+- Page responsive mobile-first (mobile / tablet / desktop).
+- Support complet **Dark Mode** / **Light Mode** (variables CSS + classes `dark:` Tailwind).
+- Composants petits, testables, exportés et réutilisables.
+- Typage strict (interfaces/types centralisés).
+- Accessibilité (ARIA, keyboard navigation, focus states).
+- Skeletons + états empty/error.
+- Mock data fournie pour chaque composant.
+
+COMPONENTS & RESPONSABILITÉS (détaillé)
+
+1. `NotificationsLayout.tsx`
+   - Wrapper page : meta, breadcrumb, responsive grid, dark mode context provider if needed.
+   - Renders `Header`, `Sidebar`, main content area.
+
+2. `Header.tsx`
+   - Contient search global (accessible), quick filters pill, avatar dropdown, unread counter.
+   - Props minimal : `onSearch: (q:string)=>void`.
+
+3. `NotificationsToolbar.tsx`
+   - Boutons : Marquer tout lu, Filtrer, Export CSV, Refresh.
+   - Toggle live updates (on/off).
+   - Accessible keyboard shortcuts (ex: press "m" => mark all read).
+
+4. `NotificationFilters.tsx`
+   - Drawer/panel avec filtres : Channels (Facebook/WhatsApp/IG), Types (Info/Error/Warning), Date range, Tags, Status (Unread/Read).
+   - Debounced filter changes (300ms).
+
+5. `NotificationList.tsx`
+   - Virtualized list (react-window ou équivalent) pour perf.
+   - Support pagination / infinite scroll + "load more".
+   - Renders `NotificationItem` for each row.
+   - Props: `items: Notification[]`, `onSelect: (id) => void`, `onBulkAction: (action, ids) => void`.
+
+6. `NotificationItem.tsx`
+   - Compact row: avatar/icon, title (highlight search matches), short message preview, timestamp (relative), status badge, kebab menu (Voir / Marquer lu / Supprimer).
+   - Accessible (role="listitem", keyboard focusable).
+   - Accepts `isSelected` prop, supports checkbox for bulk actions.
+
+7. `NotificationDetailsPanel.tsx`
+   - Slide-over panel to show full notification details, metadata and action buttons.
+   - Should be reusable modal/drawer component from `ui/Modal.tsx` or `ui/Drawer.tsx`.
+
+8. `EmptyState.tsx` & `ErrorState.tsx`
+   - Friendly messages, CTA (Créer une campagne / Voir docs), and consistent visuals.
+
+9. `ui/*` components
+   - Minimal, well-typed primitives (Button, Icon, Badge, Skeleton) with dark/light support and Tailwind tokens.
+
+TYPES (types.ts)
+
+- `Notification { id: string; channel: 'facebook'|'whatsapp'|'instagram'|'email'; type: 'info'|'warning'|'error'|'success'; title: string; body: string; meta?: Record<string,string>; timestamp: string; read: boolean; tags?: string[]; }`
+- Exporte `FilterOptions`, `ToolbarActions`, etc.

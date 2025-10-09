@@ -1,0 +1,72 @@
+Génère la page **Dashboard → Campaigns → Toutes les campagnes** pour AI4Local.  
+Contraintes : code TypeScript strict, placer tous les fichiers sous `src/app/*`, respecter l’architecture et les conventions déjà définies pour la page Realtime (components modularisés, UI primitives, dark/light mode, mobile-first). Utilise Tailwind CSS et scripts Bun. Fourni uniquement TSX/TS + README + mocks + tests exemples.
+
+EXIGENCES GÉNÉRALES
+
+- Mobile-first, responsive (sm/md/lg/xl). Sidebar collapsible / drawer mobile.
+- Dark & Light mode support (CSS variables + Tailwind `dark:`).
+- Composants petits, testables, exportés, documentés.
+- Accessibilité (ARIA, keyboard nav, focus).
+- Skeletons + états empty/error.
+- Virtualization pour listes longues (react-window ou équivalent).
+- Tests unitaires examples (Jest + RTL).
+
+FONCTIONNALITÉS CLÉS (détaillées)
+
+1. `CampaignsLayout.tsx`
+   - Wrapper page, breadcrumb "Dashboard / Campaigns", grid responsive.
+2. `CampaignsPage.tsx`
+   - Compose les modules : Toolbar, Filters, StatsCards, CampaignsList, RightPane (preview/details).
+3. `CampaignFilters.tsx` (drawer)
+   - Filtres : statut (Draft/Active/Scheduled/Paused/Archived/Failed), channel (FB/WhatsApp/IG), owner, tags, date range, search global. Debounce 300ms.
+4. `CampaignsList.tsx`
+   - Virtualized table/list. Colonnes: Checkbox, Name, Channel, Status, Start/End, Impressions, Clicks, Conversions, Owner, Actions. Sortable cols. Inline filters per column.
+5. `CampaignRow.tsx`
+   - Row détaillée : thumbnail/mock preview, A/B test badge, progress bar, KPI mini (impr/clicks/conversions), kebab menu (Edit / Duplicate / Pause / Resume / Archive / Delete). Accessible.
+6. `CampaignEditorModal.tsx`
+   - Modal pour créer/éditer campagne : form typé (title, channel, audience, creative, schedule, budget, UTM, template selection). Validation client-side. Support save draft / schedule / publish.
+7. `CampaignQuickActions.tsx`
+   - Bulk actions: Publish, Pause, Archive, Delete, Export CSV. Confirmation modals for destructive actions.
+8. `CampaignTemplatesPanel.tsx`
+   - Library of templates with preview + apply.
+9. `ABTestManager.tsx`
+   - Option pour créer A/B test variants, assign traffic split, track metric to win (CTR / Conversions). Simple UI to enable/disable tests.
+10. `CampaignStatsCard.tsx`
+    - KPI cards & miniature charts (sparkline) per campaign or global summary. Colors: primary series = --brand-mid, accent = --brand-light.
+
+TYPES (types.ts)
+
+- `Campaign { id:string; name:string; channel:'facebook'|'whatsapp'|'instagram'; status:'draft'|'active'|'scheduled'|'paused'|'archived'|'failed'; startAt?:string; endAt?:string; owner:string; impressions:number; clicks:number; conversions:number; budget?:number; tags?:string[]; abTest?: { enabled:boolean; variants: { id:string; name:string; pct:number }[] }; templateId?:string }`
+- `FilterOptions`, `BulkAction`, etc.
+
+INTERACTIONS & COMPORTEMENTS
+-Sortable & searchable table.
+-Row actions open CampaignEditorModal (edit) or quick confirm dialogs.
+-Bulk select + actions with toast confirmations.
+-Schedule picker with timezone handling.
+-AB test creation + traffic split UI.
+-Charts sparklines interactive (hover tooltip).
+-Responsive: on mobile list collapses to card view with essential info and actions in kebab menu.
+-Dark mode styling and chart color variants.
+
+PERFORMANCE & QUALITÉ
+-Virtualize lists.
+-Memoize rows (React.memo).
+-No any. Strong TS typing.
+-Avoid inline anonymous functions in lists.
+-Unit tests examples for CampaignRow and bulk actions.
+
+DELIVERABLES
+-Tous les fichiers TSX/TS listés ci-dessus.
+-types.ts et mocks/campaigns.mock.ts (≥10 items).
+-examples/CampaignsExample.tsx qui montre page montée avec mocks and mocked APIs.
+-README.md expliquant intégration, props attendues, comment brancher API réelle, et comment activer dark mode.
+-tests/CampaignRow.test.tsx sample.
+
+BONNES PRATIQUES (rappel)
+-Structure components/ui, components/modules/campaigns, components/layout.
+-Naming clair (PascalCase).
+-Single responsibility.
+-Use context/provider for filters & selected rows.
+-Exports index.ts pour chaque dossier.
+-Commentaire en haut de chaque fichier résumant responsabilité.

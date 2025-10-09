@@ -45,6 +45,14 @@
 
 :root {
   /* AI4Local Brand Colors */
+  --brand-dark: #0a4595;
+  --brand-mid: #1f6cc5;
+  --brand-light: #63b3ed;
+  --brand-ghost: #a7d8f9;
+  --bg: #ffffff;
+  --text: #0f172a;
+
+  /* Legacy Variables (keep for compatibility) */
   --ai4local-primary: #0a4595;
   --ai4local-accent: #1f6cc5;
   --ai4local-secondary: #63b3ed;

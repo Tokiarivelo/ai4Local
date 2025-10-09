@@ -1,0 +1,118 @@
+Génère la page **Dashboard → Campaigns → Create** pour AI4Local.
+
+Contrainte principale : respecter STRICTEMENT la même structure, les conventions et bonnes pratiques que la page Realtime (code TypeScript, Next.js App Router, Tailwind CSS, mobile-first, dark/light). Utiliser Bun pour les scripts (dev/build/start).
+
+Dépendances recommandées :
+
+- Next.js 15.x, React 19.x, Tailwind 4.x, React Hook Form 7.x, Zod 4.x, TypeScript 5.x, Bun runtime. (Utiliser versions stables récentes.)
+
+ARCHITECTURE & ARBORESCENCE (placer sous `app/modules`)
+
+- campaigns/create/layout/
+  - CampaignCreateLayout.tsx // wrapper, breadcrumb, responsive grid
+  - Header.tsx
+- ui/
+  - Button.tsx
+  - Input.tsx
+  - Select.tsx
+  - Toggle.tsx
+  - Modal.tsx
+  - Drawer.tsx
+  - FileUploader.tsx
+  - FormField.tsx
+  - Badge.tsx
+  - Skeleton.tsx
+- modules/campaigns/create/components/
+  - CampaignCreatePage.tsx // entry point page
+  - CreateCampaignForm.tsx // form wrapper (uses RHF + Zod)
+  - CreativeUploader.tsx // upload / crop / compress / preview images & videos
+  - AudienceBuilder.tsx // build audience segments, import CSV, selectors
+  - Scheduler.tsx // date/time picker, timezone aware, recurring
+  - BudgetPlanner.tsx // budget, pacing, currency, spend caps
+  - PreviewPanel.tsx // live preview (post + ad) + accessibility preview
+  - UTMAndTracking.tsx // UTM generator, tracking toggles
+  - TemplateSelector.tsx // templates / reusable creative library
+  - ABTestControls.tsx // variant definitions, traffic split UI
+  - ValidationSummary.tsx // show Zod validation errors nicely
+  - CreateCampaignActions.tsx // Save draft / Validate / Schedule / Publish buttons
+- modules/campaigns/create/types.ts // Campaign types, Form DTOs, Enums
+- modules/campaigns/create/mocks/
+  - campaign-create.mock.ts // mock templates, audiences, channels
+- modules/campaigns/create/utils/
+  - compression.ts // image/video compression helper
+  - sanitize.ts // sanitize user inputs
+  - validators.ts // shared zod schemas
+- modules/campaigns/create/examples/
+  - CampaignCreateExample.tsx // mounts the page with mocked APIs + mock websocket for preview
+- modules/campaigns/create/README.md // short integration guide, props, hooks to replace with real API
+- modules/campaigns/create/tests/
+  - CreateCampaignForm.test.tsx // example tests
+
+CONTRAINTES FONCTIONNELLES & UX
+
+1. Form flow (wizard-like or single page with anchors)
+   - Step 1 : Basic Info (name, objective, channel selection)
+   - Step 2 : Creative (upload images/videos OR select template)
+   - Step 3 : Audience (existing segments, custom audience builder, CSV import)
+   - Step 4 : Schedule & Budget (start/end, timezone, daily budget, pacing)
+   - Step 5 : Tracking & Review (UTM, preview, AB test config)
+   - Final : Validate & Publish (save draft / schedule / publish now)
+
+2. Validation & forms
+   - Use React Hook Form for state + Zod for schema validation.
+   - Provide both client-side validation and an extensible server-side validation hook (types + example).
+   - Zod schema must be in `utils/validators.ts` and re-used for form typing (z.infer).
+
+3. File upload & media
+   - CreativeUploader handles drag-n-drop, preview, inline crop, client-side compression, and returns optimized URLs (mock).
+   - Provide fallbacks for low-bandwidth (option: "upload-light" that only sends compressed thumbs).
+
+4. Audience builder
+   - Provide UI to: create segment by filters (location, tags, last_purchases), import CSV (parse & preview), save as segment.
+   - Show estimated audience size (mocked) and device/connectivity hints (mobile/desktop split).
+
+5. Scheduler & timezone
+   - Date/time picker with timezone awareness, validation ensuring end > start.
+   - Quick presets (Now, Today 09:00, Tomorrow, Next Monday).
+   - Support scheduled recurring posts (daily/weekly).
+
+6. Budget planner & pacing
+   - Min/Max validations, currency formatting, show estimated reach (mock formulas).
+   - Option to set lifetime vs daily budget, and pacing strategy (standard/accelerated).
+
+7. Preview & AB testing
+   - Live PreviewPanel shows post rendering for each selected channel.
+   - ABTestControls allow add variants (image/title), set traffic split and choose winning metric.
+   - Preview updates immediately on change; use debounced updates.
+
+8. Accessibility & i18n
+   - All inputs labelled, error text readable, keyboard navigation, ARIA attributes.
+   - Texts externalized for i18n (FR/MG placeholders).
+
+9. Dark/Light mode & responsive
+   - Mobile-first CSS, collapse to single column on mobile.
+   - Support `dark:` variants and CSS variable fallbacks.
+
+PERFORMANCE & QUALITY
+
+- Virtualize long lists (audience members / CSV preview).
+- Debounce heavy computations (preview render, audience estimates).
+- Memoize heavy components and avoid inline functions in lists.
+- Provide skeletons for async loads and friendly empty states.
+
+DELIVERABLES EXACTS (attendus du générateur)
+-Tous les fichiers TSX/TS mentionnés, bien commentés (header comment expliquant responsabilité).
+-types.ts avec interfaces et DTOs réutilisables.
+-utils/validators.ts (Zod schemas) et CreateCampaignForm.tsx utilisant RHF + Zod resolver.
+-CampaignCreateExample.tsx qui démonstre l’intégration avec mocks et simule l’upload compressé + preview + schedule + publish flow.
+-README court expliquant : où coller les fichiers, points d’extension (hook API), comment remplacer mocks par l’API réelle, scripts Bun (bun dev, bun run next build, bun run next start).
+-Tests exemples (CreateCampaignForm.test.tsx) montrant validation & submit behaviour.
+-Accessibility checklist in README.
+
+BONNES PRATIQUES & STYLE
+-Typage strict (no any), reuse of types between front and API layers.
+-Small single-responsibility components, exported via index.ts per folder.
+-Use Context / Provider for wizard state and for editable draft.
+-Keep UI primitives in components/ui and business modules in modules/campaigns/create.
+-Avoid large monolith components — split form sections into dedicated components.
+-Provide storybook-ready export (prop examples) if possible.
