@@ -1,411 +1,541 @@
+/**
+ * Étape Informations de base - Nom, objectif et canaux
+ * Gère la configuration des informations fondamentales de la campagne
+ */
+
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { Lightbulb, Target, Globe, MessageSquare, Mail, Smartphone } from 'lucide-react';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { motion } from 'framer-motion';
+import {
+  Target,
+  Mail,
+  MessageSquare,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Twitter,
+  Youtube,
+  Search,
+  Smartphone,
+  Globe,
+  Info,
+  Sparkles,
+} from 'lucide-react';
 
-import { Input } from '@/app/modules/ui/input';
-import { Label } from '@/app/modules/ui/label';
-import { Textarea } from '@/app/modules/ui/textarea';
 import { Card } from '@/app/modules/ui/card';
-import { Badge } from '@/app/modules/ui/badge';
 import { Button } from '@/app/modules/ui/button';
-import { Checkbox } from '@/app/modules/ui/checkbox';
+import { Input } from '@/app/modules/ui/input';
+import { Badge } from '@/app/modules/ui/badge';
+import { Textarea } from '@/app/modules/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/modules/ui/select';
 
-import { mockChannelConfig } from '../../mocks/campaign-create.mock';
+import { BasicInfoStepSchema, type BasicInfoStepData } from './validators';
+import { useCampaignCreateContext } from '../../context/WizardContext';
+import type { CampaignChannel, CampaignObjective, CampaignType } from '../../types';
 
 interface BasicInfoStepProps {
+  onComplete?: () => void;
+  onValidationChange?: (isValid: boolean) => void;
   isValidating?: boolean;
-  onAsyncValidation?: (data: unknown) => Promise<void>;
+  onAsyncValidation?: (data: any) => Promise<void>;
   isEditing?: boolean;
 }
 
-const CAMPAIGN_OBJECTIVES: ReadonlyArray<{
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  color: string;
-  recommended: string[];
-}> = [
+// Configuration des objectifs avec descriptions
+const CAMPAIGN_OBJECTIVES = [
   {
-    id: 'awareness',
+    id: 'awareness' as CampaignObjective,
     title: 'Notoriété',
-    description: 'Faire connaître votre marque à de nouveaux prospects',
+    description: 'Faire connaître votre marque ou produit',
     icon: Globe,
     color: 'bg-blue-500',
-    recommended: ['facebook', 'instagram', 'youtube'],
   },
   {
-    id: 'traffic',
+    id: 'traffic' as CampaignObjective,
     title: 'Trafic',
     description: 'Diriger les visiteurs vers votre site web',
-    icon: Target,
+    icon: Search,
     color: 'bg-green-500',
-    recommended: ['google_ads', 'facebook', 'linkedin'],
   },
   {
-    id: 'engagement',
+    id: 'engagement' as CampaignObjective,
     title: 'Engagement',
-    description: 'Augmenter les interactions avec votre contenu',
-    icon: MessageSquare,
+    description: 'Encourager les interactions avec votre contenu',
+    icon: Target,
     color: 'bg-purple-500',
-    recommended: ['instagram', 'facebook', 'twitter'],
   },
   {
-    id: 'leads',
+    id: 'leads' as CampaignObjective,
     title: 'Génération de leads',
     description: 'Collecter des contacts qualifiés',
     icon: Mail,
     color: 'bg-orange-500',
-    recommended: ['linkedin', 'email', 'google_ads'],
   },
   {
-    id: 'conversions',
+    id: 'conversions' as CampaignObjective,
     title: 'Conversions',
-    description: 'Transformer les prospects en clients',
+    description: "Inciter à l'action (achat, inscription...)",
     icon: Target,
     color: 'bg-red-500',
-    recommended: ['google_ads', 'facebook', 'email'],
   },
   {
-    id: 'retention',
-    title: 'Fidélisation',
-    description: "Maintenir l'engagement des clients existants",
-    icon: Smartphone,
-    color: 'bg-teal-500',
-    recommended: ['email', 'whatsapp', 'sms'],
+    id: 'sales' as CampaignObjective,
+    title: 'Ventes',
+    description: 'Générer des ventes directes',
+    icon: Sparkles,
+    color: 'bg-indigo-500',
   },
 ] as const;
 
-/**
- * Étape 1: Informations de base de la campagne
- * Nom, description, objectif et sélection des canaux
- */
-export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
+// Configuration des canaux avec icônes
+const CAMPAIGN_CHANNELS = [
+  {
+    id: 'email' as CampaignChannel,
+    title: 'Email',
+    description: 'Newsletters et emails marketing',
+    icon: Mail,
+    color: 'bg-blue-500',
+  },
+  {
+    id: 'sms' as CampaignChannel,
+    title: 'SMS',
+    description: 'Messages texte directs',
+    icon: MessageSquare,
+    color: 'bg-green-500',
+  },
+  {
+    id: 'whatsapp' as CampaignChannel,
+    title: 'WhatsApp',
+    description: 'Messages via WhatsApp Business',
+    icon: MessageSquare,
+    color: 'bg-green-600',
+  },
+  {
+    id: 'facebook' as CampaignChannel,
+    title: 'Facebook',
+    description: 'Publicités sur Facebook',
+    icon: Facebook,
+    color: 'bg-blue-600',
+  },
+  {
+    id: 'instagram' as CampaignChannel,
+    title: 'Instagram',
+    description: 'Stories et posts sponsorisés',
+    icon: Instagram,
+    color: 'bg-pink-500',
+  },
+  {
+    id: 'google_ads' as CampaignChannel,
+    title: 'Google Ads',
+    description: 'Publicités sur Google Search & Display',
+    icon: Search,
+    color: 'bg-yellow-500',
+  },
+  {
+    id: 'linkedin' as CampaignChannel,
+    title: 'LinkedIn',
+    description: 'Réseau professionnel B2B',
+    icon: Linkedin,
+    color: 'bg-blue-700',
+  },
+  {
+    id: 'twitter' as CampaignChannel,
+    title: 'Twitter/X',
+    description: 'Tweets sponsorisés',
+    icon: Twitter,
+    color: 'bg-gray-900',
+  },
+  {
+    id: 'youtube' as CampaignChannel,
+    title: 'YouTube',
+    description: 'Publicités vidéo',
+    icon: Youtube,
+    color: 'bg-red-600',
+  },
+  {
+    id: 'tiktok' as CampaignChannel,
+    title: 'TikTok',
+    description: 'Contenu viral et tendance',
+    icon: Smartphone,
+    color: 'bg-black',
+  },
+] as const;
+
+// Types de campagne
+const CAMPAIGN_TYPES = [
+  { id: 'promotion', title: 'Promotion', description: 'Offres spéciales et réductions' },
+  { id: 'newsletter', title: 'Newsletter', description: 'Information régulière' },
+  { id: 'lead_generation', title: 'Génération de leads', description: 'Collecte de contacts' },
+  { id: 'retention', title: 'Fidélisation', description: 'Réengager les clients existants' },
+  { id: 'event', title: 'Événement', description: "Promotion d'événements" },
+  { id: 'product_launch', title: 'Lancement produit', description: 'Nouveau produit ou service' },
+  { id: 'seasonal', title: 'Saisonnier', description: 'Campagnes liées aux saisons' },
+] as const;
+
+export function BasicInfoStep({
+  onComplete,
+  onValidationChange,
   isValidating = false,
   onAsyncValidation,
   isEditing = false,
-}) => {
+}: BasicInfoStepProps) {
+  const { data, updateStepData, completeStep } = useCampaignCreateContext();
+
+  // Cast des données avec une interface étendue pour basicInfo
+  const typedData = data as any;
+
+  const [selectedObjective, setSelectedObjective] = useState<CampaignObjective | null>(
+    typedData.basicInfo?.objective || null
+  );
+  const [selectedChannels, setSelectedChannels] = useState<CampaignChannel[]>(
+    typedData.basicInfo?.channels || []
+  );
+
+  const form = useForm<BasicInfoStepData>({
+    resolver: zodResolver(BasicInfoStepSchema),
+    defaultValues: {
+      name: typedData.basicInfo?.name || '',
+      description: typedData.basicInfo?.description || '',
+      objective: selectedObjective || 'awareness',
+      type: typedData.basicInfo?.type || 'promotion',
+      channels: selectedChannels,
+    },
+    mode: 'onChange',
+  });
+
   const {
     register,
-    watch,
+    handleSubmit,
+    formState: { errors, isValid },
     setValue,
-    formState: { errors },
-    trigger,
-  } = useFormContext();
+    watch,
+    getValues,
+  } = form;
 
-  const watchedValues = watch();
-  const selectedObjective = watch('objective');
-  const selectedChannels = (watch('channels') as string[] | undefined) || [];
+  // Surveillez uniquement les champs nécessaires pour éviter les re-renders inutiles
+  const formName = watch('name');
+  const formDescription = watch('description');
+  const formType = watch('type');
 
-  // Suggestions automatiques basées sur l'objectif
-  useEffect(() => {
-    if (selectedObjective && selectedChannels.length === 0) {
-      const objective = CAMPAIGN_OBJECTIVES.find((obj) => obj.id === selectedObjective);
-      if (objective) {
-        setValue('channels', objective.recommended);
-        trigger('channels');
-      }
-    }
-  }, [selectedObjective, selectedChannels.length, setValue, trigger]);
+  // Mise à jour du contexte avec stabilisation des dépendances
+  React.useEffect(() => {
+    const basicInfoData = {
+      name: formName || '',
+      description: formDescription || '',
+      type: formType || 'promotion',
+      objective: selectedObjective || 'awareness',
+      channels: selectedChannels,
+    };
 
-  // Validation asynchrone quand les données changent
-  useEffect(() => {
-    if (onAsyncValidation && watchedValues.name && watchedValues.objective) {
-      const timer = setTimeout(() => {
-        onAsyncValidation(watchedValues);
-      }, 500);
+    updateStepData({
+      basicInfo: basicInfoData,
+    });
+  }, [formName, formDescription, formType, selectedObjective, selectedChannels, updateStepData]);
 
-      return () => clearTimeout(timer);
-    }
-  }, [watchedValues, onAsyncValidation]);
+  // Notification de validation avec stabilisation
+  const isFormValid = React.useMemo(() => {
+    return isValid && selectedObjective && selectedChannels.length > 0;
+  }, [isValid, selectedObjective, selectedChannels.length]);
 
-  const handleChannelToggle = useCallback(
-    (channelId: string) => {
-      const currentChannels = (watch('channels') as string[]) || [];
-      const updatedChannels = currentChannels.includes(channelId)
-        ? currentChannels.filter((c: string) => c !== channelId)
-        : [...currentChannels, channelId];
+  React.useEffect(() => {
+    onValidationChange?.(Boolean(isFormValid));
+  }, [isFormValid, onValidationChange]);
 
-      setValue('channels', updatedChannels);
-      trigger('channels');
-    },
-    [setValue, trigger, watch]
-  );
-
-  const handleObjectiveSelect = useCallback(
-    (objectiveId: string) => {
-      setValue('objective', objectiveId);
-      trigger('objective');
-
-      // Suggérer les canaux recommandés
-      const objective = CAMPAIGN_OBJECTIVES.find((obj) => obj.id === objectiveId);
-      const currentChannels = (watch('channels') as string[]) || [];
-      if (objective && currentChannels.length === 0) {
-        setValue('channels', objective.recommended);
-        trigger('channels');
+  const handleObjectiveSelect = React.useCallback(
+    (objective: CampaignObjective) => {
+      if (selectedObjective !== objective) {
+        setSelectedObjective(objective);
+        setValue('objective', objective as any, { shouldValidate: true });
       }
     },
-    [setValue, trigger, watch]
+    [setValue, selectedObjective]
   );
 
-  const handleSelectAllChannels = useCallback(() => {
-    const allChannels = Object.keys(mockChannelConfig);
-    setValue('channels', allChannels);
-    trigger('channels');
-  }, [setValue, trigger]);
+  const handleChannelToggle = React.useCallback(
+    (channel: CampaignChannel) => {
+      setSelectedChannels((prev) => {
+        const isCurrentlySelected = prev.includes(channel);
+        const newChannels = isCurrentlySelected
+          ? prev.filter((c) => c !== channel)
+          : [...prev, channel];
 
-  const handleDeselectAllChannels = useCallback(() => {
-    setValue('channels', []);
-    trigger('channels');
-  }, [setValue, trigger]);
+        // Seulement si la sélection a vraiment changé
+        if (newChannels.length !== prev.length || !newChannels.every((c) => prev.includes(c))) {
+          setValue('channels', newChannels, { shouldValidate: true });
+        }
+
+        return newChannels;
+      });
+    },
+    [setValue]
+  );
+
+  const onSubmit = React.useCallback(
+    (data: BasicInfoStepData) => {
+      completeStep('basic_info');
+      onComplete?.();
+    },
+    [completeStep, onComplete]
+  );
 
   return (
     <div className="space-y-8">
-      {/* Informations générales */}
-      <Card className="p-6">
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Informations générales</h3>
-          <p className="text-muted-foreground">
-            Définissez l'identité et l'objectif de votre campagne.
-          </p>
-        </div>
+      {/* En-tête */}
+      <div>
+        <h3 className="text-lg font-semibold">Informations de base</h3>
+        <p className="text-sm text-muted-foreground">
+          Définissez les informations essentielles de votre campagne
+        </p>
+      </div>
 
-        <div className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Nom de la campagne */}
-            <div className="space-y-2">
-              <Label htmlFor="name">Nom de la campagne *</Label>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        {/* Informations générales */}
+        <Card className="p-6">
+          <h4 className="font-medium mb-4">Détails de la campagne</h4>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-2 block">Nom de la campagne *</label>
               <Input
-                id="name"
-                placeholder="Ex: Promotion Black Friday 2024"
                 {...register('name')}
-                className={errors.name ? 'border-red-500' : ''}
+                placeholder="Ex: Lancement produit automne 2024"
+                className={errors.name ? 'border-destructive' : ''}
               />
               {errors.name && (
-                <p className="text-sm text-red-600">{errors.name.message as string}</p>
+                <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
               )}
-              <p className="text-xs text-muted-foreground">
-                Un nom descriptif aide à organiser vos campagnes
-              </p>
             </div>
 
-            {/* Statut/Badge */}
-            <div className="space-y-2">
-              <Label>Statut</Label>
-              <div className="flex items-center space-x-2 pt-2">
-                <Badge variant="outline" className="text-yellow-600 border-yellow-300">
-                  🚧 Brouillon
-                </Badge>
-                {isEditing && (
-                  <Badge variant="outline" className="text-blue-600 border-blue-300">
-                    ✏️ Modification
-                  </Badge>
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-2 block">Description (optionnel)</label>
+              <Textarea
+                {...register('description')}
+                placeholder="Décrivez l'objectif et le contexte de votre campagne..."
+                rows={3}
+                className="resize-none"
+              />
+              {errors.description && (
+                <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Type de campagne</label>
+              <Select
+                value={formType || 'promotion'}
+                onValueChange={React.useCallback(
+                  (value: string) => {
+                    if (value !== formType) {
+                      setValue('type', value as CampaignType, { shouldValidate: true });
+                    }
+                  },
+                  [setValue, formType]
                 )}
-              </div>
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CAMPAIGN_TYPES.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      <div>
+                        <div className="font-medium">{type.title}</div>
+                        <div className="text-xs text-muted-foreground">{type.description}</div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
+        </Card>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Décrivez le but de cette campagne, votre cible et vos attentes..."
-              rows={3}
-              {...register('description')}
-              className={errors.description ? 'border-red-500' : ''}
-            />
-            {errors.description && (
-              <p className="text-sm text-red-600">{errors.description.message as string}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Une description claire améliore la collaboration en équipe
+        {/* Objectif de la campagne */}
+        <Card className="p-6">
+          <div className="mb-4">
+            <h4 className="font-medium">Objectif principal *</h4>
+            <p className="text-sm text-muted-foreground">
+              Choisissez l'objectif principal de votre campagne
             </p>
           </div>
-        </div>
-      </Card>
 
-      {/* Objectif de la campagne */}
-      <Card className="p-6">
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Objectif de la campagne *</h3>
-          <p className="text-muted-foreground">
-            Choisissez l'objectif principal qui guidera l'optimisation de votre campagne.
-          </p>
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {CAMPAIGN_OBJECTIVES.map((objective) => {
+              const isSelected = selectedObjective === objective.id;
+              const IconComponent = objective.icon;
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CAMPAIGN_OBJECTIVES.map((objective) => {
-            const Icon = objective.icon;
-            const isSelected = selectedObjective === objective.id;
-
-            return (
-              <Card
-                key={objective.id}
-                className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                  isSelected
-                    ? 'ring-2 ring-blue-500 shadow-lg bg-blue-50 dark:bg-blue-950'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
-                onClick={() => handleObjectiveSelect(objective.id)}
-              >
-                <div className="p-4">
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className={`w-10 h-10 rounded-lg ${objective.color} flex items-center justify-center`}
-                    >
-                      <Icon className="w-5 h-5 text-white" />
+              return (
+                <motion.div
+                  key={objective.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`
+                    relative p-4 border rounded-lg cursor-pointer transition-all
+                    ${
+                      isSelected
+                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                        : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                    }
+                  `}
+                  onClick={() => handleObjectiveSelect(objective.id)}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg text-white ${objective.color}`}>
+                      <IconComponent className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium mb-1">{objective.title}</h4>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {objective.description}
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {objective.recommended.slice(0, 2).map((channel) => (
-                          <Badge key={channel} variant="secondary" size="sm">
-                            {mockChannelConfig[channel as keyof typeof mockChannelConfig]?.name ||
-                              channel}
-                          </Badge>
-                        ))}
-                        {objective.recommended.length > 2 && (
-                          <Badge variant="secondary" size="sm">
-                            +{objective.recommended.length - 2}
-                          </Badge>
-                        )}
+                      <h5 className="font-medium text-sm">{objective.title}</h5>
+                      <p className="text-xs text-muted-foreground mt-1">{objective.description}</p>
+                    </div>
+                  </div>
+
+                  {isSelected && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute top-2 right-2"
+                    >
+                      <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                        <Target className="h-3 w-3 text-primary-foreground" />
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
 
-        {errors.objective && (
-          <p className="text-sm text-red-600 mt-2">{errors.objective.message as string}</p>
-        )}
-      </Card>
-
-      {/* Sélection des canaux */}
-      <Card className="p-6">
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Canaux de diffusion *</h3>
-          <p className="text-muted-foreground">
-            Sélectionnez les plateformes où votre campagne sera diffusée.
-          </p>
-          {selectedObjective && (
-            <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-              <div className="flex items-start space-x-2">
-                <Lightbulb className="w-4 h-4 text-blue-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                    Canaux recommandés pour "
-                    {CAMPAIGN_OBJECTIVES.find((o) => o.id === selectedObjective)?.title}"
-                  </p>
-                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                    Ces canaux sont optimisés pour votre objectif sélectionné
-                  </p>
-                </div>
-              </div>
-            </div>
+          {!selectedObjective && (
+            <p className="text-sm text-destructive mt-2">
+              Veuillez sélectionner un objectif pour votre campagne
+            </p>
           )}
-        </div>
+        </Card>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {Object.entries(mockChannelConfig).map(([channelId, config]) => {
-            const isSelected = selectedChannels.includes(channelId);
-            const isRecommended =
-              selectedObjective &&
-              Array.from(
-                CAMPAIGN_OBJECTIVES.find((o) => o.id === selectedObjective)?.recommended ?? []
-              ).includes(channelId);
-
-            return (
-              <div
-                key={channelId}
-                className={`relative border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                  isSelected
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
-              >
-                {isRecommended && (
-                  <Badge
-                    variant="default"
-                    size="sm"
-                    className="absolute -top-2 -right-2 bg-green-500"
-                  >
-                    Recommandé
-                  </Badge>
-                )}
-
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={() => handleChannelToggle(channelId)}
-                  />
-                  <div
-                    className="flex-1 cursor-pointer"
-                    onClick={() => handleChannelToggle(channelId)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">{config.icon}</span>
-                      <span className="font-medium">{config.name}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">{config.description}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {errors.channels && (
-          <p className="text-sm text-red-600 mt-2">{errors.channels.message as string}</p>
-        )}
-
-        {selectedChannels.length > 0 && (
-          <div className="mt-4 p-3 bg-green-50 dark:bg-green-950 rounded-lg">
-            <p className="text-sm text-green-800 dark:text-green-200">
-              ✅ {selectedChannels.length} canal{selectedChannels.length > 1 ? 'aux' : ''}{' '}
-              sélectionné{selectedChannels.length > 1 ? 's' : ''}
+        {/* Canaux de distribution */}
+        <Card className="p-6">
+          <div className="mb-4">
+            <h4 className="font-medium">Canaux de distribution *</h4>
+            <p className="text-sm text-muted-foreground">
+              Sélectionnez les canaux où vous souhaitez diffuser votre campagne
             </p>
           </div>
-        )}
-      </Card>
 
-      {/* Actions rapides */}
-      <Card className="p-4 bg-gray-50 dark:bg-gray-800/50">
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="font-medium text-sm mb-1">Actions rapides</h4>
-            <p className="text-xs text-muted-foreground">Optimisez votre configuration</p>
-          </div>
-          <div className="flex space-x-2">
-            <Button type="button" variant="outline" size="sm" onClick={handleSelectAllChannels}>
-              Tout sélectionner
-            </Button>
-            <Button type="button" variant="outline" size="sm" onClick={handleDeselectAllChannels}>
-              Tout désélectionner
-            </Button>
-          </div>
-        </div>
-      </Card>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {CAMPAIGN_CHANNELS.map((channel) => {
+              const isSelected = selectedChannels.includes(channel.id);
+              const IconComponent = channel.icon;
 
-      {/* Indicateur de validation */}
-      {isValidating && (
-        <div className="text-center">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-50 dark:bg-blue-950 rounded-lg">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
-            <span className="text-sm text-blue-800 dark:text-blue-200">
-              Validation des informations...
-            </span>
+              return (
+                <motion.div
+                  key={channel.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`
+                    relative p-3 border rounded-lg cursor-pointer transition-all
+                    ${
+                      isSelected
+                        ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                        : 'border-border hover:border-primary/50'
+                    }
+                  `}
+                  onClick={() => handleChannelToggle(channel.id)}
+                >
+                  <div className="text-center">
+                    <div
+                      className={`
+                      w-8 h-8 rounded-lg mx-auto mb-2 flex items-center justify-center text-white
+                      ${isSelected ? channel.color : 'bg-muted'}
+                    `}
+                    >
+                      <IconComponent className="h-4 w-4" />
+                    </div>
+                    <p className="text-xs font-medium">{channel.title}</p>
+                  </div>
+
+                  {isSelected && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute -top-1 -right-1"
+                    >
+                      <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                        <Target className="h-2 w-2 text-primary-foreground" />
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
+
+          {selectedChannels.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="text-sm text-muted-foreground">Canaux sélectionnés:</span>
+              {selectedChannels.map((channelId) => {
+                const channel = CAMPAIGN_CHANNELS.find((c) => c.id === channelId);
+                return channel ? (
+                  <Badge key={channelId} variant="secondary" className="text-xs">
+                    {channel.title}
+                  </Badge>
+                ) : null;
+              })}
+            </div>
+          )}
+
+          {selectedChannels.length === 0 && (
+            <p className="text-sm text-destructive mt-2">
+              Veuillez sélectionner au moins un canal de distribution
+            </p>
+          )}
+        </Card>
+
+        {/* Recommandations */}
+        <Card className="p-4 bg-blue-50 border-blue-200">
+          <div className="flex items-start gap-2">
+            <Info className="h-4 w-4 text-blue-600 mt-0.5" />
+            <div>
+              <div className="font-medium text-blue-900 mb-1">💡 Recommandations</div>
+              <div className="text-sm text-blue-800 space-y-1">
+                {selectedObjective === 'awareness' && (
+                  <p>• Pour la notoriété, privilégiez Facebook, Instagram et Google Ads</p>
+                )}
+                {selectedObjective === 'leads' && (
+                  <p>• Pour les leads, combinez LinkedIn, email et Google Ads</p>
+                )}
+                {selectedObjective === 'sales' && (
+                  <p>• Pour les ventes, utilisez Google Ads, Facebook et email</p>
+                )}
+                {selectedChannels.length > 3 && (
+                  <p>• Attention: trop de canaux peuvent diluer votre message</p>
+                )}
+                <p>• Un nom descriptif améliore le suivi de vos performances</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Actions */}
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            disabled={!selectedObjective || selectedChannels.length === 0 || !isValid}
+          >
+            Continuer vers les créatifs
+          </Button>
         </div>
-      )}
+      </form>
     </div>
   );
-};
+}
+
+export default BasicInfoStep;

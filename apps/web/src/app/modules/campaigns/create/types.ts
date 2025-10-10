@@ -189,7 +189,7 @@ export interface CampaignTemplate {
   usageCount: number;
 }
 
-// États pour le wizard
+// États pour le wizard - Version complète avec template et informations de base
 export type WizardStep =
   | 'template'
   | 'basic_info'

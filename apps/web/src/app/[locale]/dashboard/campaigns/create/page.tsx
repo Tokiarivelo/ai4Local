@@ -4,7 +4,6 @@
  */
 
 import { Metadata } from 'next';
-import { CampaignCreateDemo } from '@/app/modules/campaigns/create/components/CampaignCreateDemo';
 import { CampaignCreatePage } from '@/app/modules/campaigns/create';
 
 export const metadata: Metadata = {
