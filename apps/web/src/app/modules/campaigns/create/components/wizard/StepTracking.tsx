@@ -41,8 +41,9 @@ import { Separator } from '@/app/modules/ui/separator';
 import {
   TrackingStepSchema,
   type TrackingStepData,
-  type ABTestElement,
+  type ABTestOverrides,
   type ABTestVariant,
+  getFinalCreativeForVariant,
 } from './validators';
 import { useCampaignCreateContext } from '../../context/WizardContext';
 import { generateUTMUrl, mockPerformanceData } from '../../mock-data';
@@ -57,6 +58,9 @@ export function StepTracking({ onComplete, onValidationChange }: StepTrackingPro
 
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [enableAbTesting, setEnableAbTesting] = useState(data.tracking?.abTestEnabled || false);
+
+  // Récupération des créatifs de base pour l'A/B testing
+  const baselineCreatives = data.creatives;
 
   const form = useForm<TrackingStepData>({
     resolver: zodResolver(TrackingStepSchema),
@@ -73,35 +77,25 @@ export function StepTracking({ onComplete, onValidationChange }: StepTrackingPro
       abTestVariants: data.tracking?.abTestVariants || [
         {
           id: '1',
-          name: 'Variant A - Contrôle',
+          name: 'Contrôle - Version originale',
           percentage: 50,
           isControl: true,
-          description: 'Version originale de la campagne',
-          elements: [
-            {
-              type: 'headline',
-              value: 'Découvrez notre offre spéciale',
-              description: 'Titre principal',
-            },
-            { type: 'cta_button', value: 'En savoir plus', description: "Bouton d'action" },
-          ],
-          expectedOutcome: 'Baseline pour comparaison',
+          description: "Version de base créée dans l'étape Créatifs",
+          overrides: {}, // Pas d'overrides = utilise la baseline
+          expectedOutcome: 'Baseline pour comparaison avec les variantes',
         },
         {
           id: '2',
-          name: 'Variant B - Test',
+          name: 'Variante A - Titre avec urgence',
           percentage: 50,
           isControl: false,
-          description: 'Version optimisée avec urgence',
-          elements: [
-            {
-              type: 'headline',
-              value: 'Offre limitée - Seulement 48h !',
-              description: 'Titre avec urgence',
-            },
-            { type: 'cta_button', value: 'Profiter maintenant', description: 'CTA plus incitatif' },
-          ],
-          expectedOutcome: "Augmentation du taux de clic grâce à l'urgence",
+          description: "Test d'un titre avec notion d'urgence",
+          overrides: {
+            headline: baselineCreatives?.headline
+              ? `${baselineCreatives.headline} - Offre limitée !`
+              : 'Offre limitée - Profitez maintenant !',
+          },
+          expectedOutcome: "Augmentation du taux de clic grâce à l'effet d'urgence",
         },
       ],
     },
@@ -383,11 +377,11 @@ export function StepTracking({ onComplete, onValidationChange }: StepTrackingPro
                     onClick={() =>
                       appendVariant({
                         id: `variant-${Date.now()}`,
-                        name: `Variant ${String.fromCharCode(65 + variantFields.length)}`,
+                        name: `Variante ${String.fromCharCode(65 + variantFields.length)}`,
                         percentage: 0,
                         isControl: false,
                         description: '',
-                        elements: [{ type: 'headline', value: '', description: 'Titre principal' }],
+                        overrides: {}, // Pas d'overrides par défaut
                         expectedOutcome: '',
                       })
                     }
@@ -442,92 +436,126 @@ export function StepTracking({ onComplete, onValidationChange }: StepTrackingPro
                         />
                       </div>
 
-                      {/* Éléments testés */}
+                      {/* Aperçu des créatifs de base */}
+                      {baselineCreatives && (
+                        <div className="space-y-3">
+                          <label className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                            📋 Créatifs de base (Étape 3)
+                          </label>
+                          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm space-y-1">
+                            <div>
+                              <strong>Titre:</strong> {baselineCreatives.headline || 'Non défini'}
+                            </div>
+                            {baselineCreatives.caption && (
+                              <div>
+                                <strong>Description:</strong> {baselineCreatives.caption}
+                              </div>
+                            )}
+                            {baselineCreatives.callToAction && (
+                              <div>
+                                <strong>CTA:</strong> {baselineCreatives.callToAction}
+                              </div>
+                            )}
+                            <div>
+                              <strong>Médias:</strong> {baselineCreatives.mediaFiles?.length || 0}{' '}
+                              fichier(s)
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Overrides des éléments testés */}
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <label className="text-sm font-medium">Éléments testés</label>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const currentElements = abTestVariants?.[index]?.elements || [];
-                              setValue(`abTestVariants.${index}.elements`, [
-                                ...currentElements,
-                                { type: 'headline', value: '', description: '' },
-                              ]);
-                            }}
-                          >
-                            <Plus className="h-3 w-3 mr-1" />
-                            Ajouter élément
-                          </Button>
+                        <label className="text-sm font-medium">
+                          🧪 Personnalisations pour cette variante
+                        </label>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          Laissez vide pour utiliser la version de base. Modifiez seulement les
+                          éléments que vous voulez tester.
                         </div>
 
                         <div className="grid grid-cols-1 gap-3">
-                          {abTestVariants?.[index]?.elements?.map((element, elementIndex) => (
-                            <div
-                              key={elementIndex}
-                              className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded border"
-                            >
-                              <Select
-                                value={element.type}
-                                onValueChange={(value) => {
-                                  const currentElements = [
-                                    ...(abTestVariants?.[index]?.elements || []),
-                                  ];
-                                  currentElements[elementIndex] = {
-                                    ...element,
-                                    type: value as any,
-                                  };
-                                  setValue(`abTestVariants.${index}.elements`, currentElements);
-                                }}
-                              >
-                                <SelectTrigger className="w-[140px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="headline">Titre</SelectItem>
-                                  <SelectItem value="description">Description</SelectItem>
-                                  <SelectItem value="cta_button">Bouton CTA</SelectItem>
-                                  <SelectItem value="image">Image</SelectItem>
-                                  <SelectItem value="video">Vidéo</SelectItem>
-                                  <SelectItem value="price">Prix</SelectItem>
-                                  <SelectItem value="offer">Offre</SelectItem>
-                                </SelectContent>
-                              </Select>
+                          {/* Override Titre */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">
+                              Titre personnalisé
+                              {abTestVariants?.[index]?.overrides?.headline && (
+                                <Badge variant="outline" className="ml-2">
+                                  Modifié
+                                </Badge>
+                              )}
+                            </label>
+                            <Input
+                              {...register(`abTestVariants.${index}.overrides.headline`)}
+                              placeholder={baselineCreatives?.headline || 'Titre de base...'}
+                              className="text-sm"
+                            />
+                          </div>
 
-                              <Input
-                                value={element.value}
-                                onChange={(e) => {
-                                  const currentElements = [
-                                    ...(abTestVariants?.[index]?.elements || []),
-                                  ];
-                                  currentElements[elementIndex] = {
-                                    ...element,
-                                    value: e.target.value,
-                                  };
-                                  setValue(`abTestVariants.${index}.elements`, currentElements);
-                                }}
-                                placeholder="Contenu de l'élément..."
-                                className="flex-1"
-                              />
+                          {/* Override Description */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">
+                              Description personnalisée
+                              {abTestVariants?.[index]?.overrides?.caption && (
+                                <Badge variant="outline" className="ml-2">
+                                  Modifié
+                                </Badge>
+                              )}
+                            </label>
+                            <Textarea
+                              {...register(`abTestVariants.${index}.overrides.caption`)}
+                              placeholder={baselineCreatives?.caption || 'Description de base...'}
+                              className="min-h-[60px] text-sm"
+                            />
+                          </div>
 
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  const currentElements = [
-                                    ...(abTestVariants?.[index]?.elements || []),
-                                  ];
-                                  currentElements.splice(elementIndex, 1);
-                                  setValue(`abTestVariants.${index}.elements`, currentElements);
-                                }}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
+                          {/* Override CTA */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">
+                              Bouton d'action personnalisé
+                              {abTestVariants?.[index]?.overrides?.callToAction && (
+                                <Badge variant="outline" className="ml-2">
+                                  Modifié
+                                </Badge>
+                              )}
+                            </label>
+                            <Input
+                              {...register(`abTestVariants.${index}.overrides.callToAction`)}
+                              placeholder={baselineCreatives?.callToAction || 'CTA de base...'}
+                              className="text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Aperçu de la variante finale */}
+                        <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                          <div className="text-sm font-medium text-green-700 dark:text-green-300 mb-2">
+                            🎯 Aperçu de cette variante
+                          </div>
+                          <div className="text-xs space-y-1">
+                            <div>
+                              <strong>Titre final:</strong>{' '}
+                              {abTestVariants?.[index]?.overrides?.headline ||
+                                baselineCreatives?.headline ||
+                                'Titre non défini'}
                             </div>
-                          )) || []}
+                            {(abTestVariants?.[index]?.overrides?.caption ||
+                              baselineCreatives?.caption) && (
+                              <div>
+                                <strong>Description finale:</strong>{' '}
+                                {abTestVariants?.[index]?.overrides?.caption ||
+                                  baselineCreatives?.caption}
+                              </div>
+                            )}
+                            {(abTestVariants?.[index]?.overrides?.callToAction ||
+                              baselineCreatives?.callToAction) && (
+                              <div>
+                                <strong>CTA final:</strong>{' '}
+                                {abTestVariants?.[index]?.overrides?.callToAction ||
+                                  baselineCreatives?.callToAction}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -561,7 +589,10 @@ export function StepTracking({ onComplete, onValidationChange }: StepTrackingPro
                 </div>
 
                 {/* Aperçu des variantes */}
-                <VariantPreview variants={abTestVariants || []} />
+                <VariantPreview
+                  variants={abTestVariants || []}
+                  baselineCreatives={baselineCreatives}
+                />
               </div>
             </motion.div>
           )}
@@ -614,44 +645,101 @@ export function StepTracking({ onComplete, onValidationChange }: StepTrackingPro
 }
 
 // Composant de prévisualisation des variantes
-function VariantPreview({ variants }: { variants: ABTestVariant[] }) {
+function VariantPreview({
+  variants,
+  baselineCreatives,
+}: {
+  variants: ABTestVariant[];
+  baselineCreatives?: any;
+}) {
   return (
     <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
       <h5 className="font-medium mb-3 flex items-center gap-2">
         <Target className="h-4 w-4" />
-        Aperçu des variantes
+        Aperçu des variantes finales
       </h5>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {variants?.map((variant, index) => (
-          <div key={variant.id} className="p-3 bg-white dark:bg-gray-800 border rounded">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-sm">{variant.name}</span>
-              <Badge variant={variant.isControl ? 'default' : 'secondary'}>
-                {variant.percentage}%
-              </Badge>
-            </div>
+        {variants?.map((variant, index) => {
+          // Fusion des créatifs de base avec les overrides
+          const finalCreative = baselineCreatives
+            ? getFinalCreativeForVariant(baselineCreatives, variant)
+            : null;
 
-            {variant.description && (
-              <p className="text-xs text-muted-foreground mb-2">{variant.description}</p>
-            )}
-
-            <div className="space-y-1">
-              {variant.elements?.map((element: ABTestElement, elemIndex: number) => (
-                <div key={elemIndex} className="text-xs">
-                  <span className="font-medium capitalize">{element.type.replace('_', ' ')}: </span>
-                  <span className="text-muted-foreground">"{element.value}"</span>
-                </div>
-              )) || []}
-            </div>
-
-            {variant.expectedOutcome && (
-              <div className="mt-2 text-xs text-green-600 dark:text-green-400">
-                🎯 {variant.expectedOutcome}
+          return (
+            <div key={variant.id} className="p-3 bg-white dark:bg-gray-800 border rounded">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-sm">{variant.name}</span>
+                <Badge variant={variant.isControl ? 'default' : 'secondary'}>
+                  {variant.percentage}%
+                </Badge>
               </div>
-            )}
-          </div>
-        )) || []}
+
+              {variant.description && (
+                <p className="text-xs text-muted-foreground mb-2">{variant.description}</p>
+              )}
+
+              {/* Aperçu du contenu final fusionné */}
+              <div className="space-y-1">
+                {finalCreative?.headline && (
+                  <div className="text-xs">
+                    <span className="font-medium">Titre: </span>
+                    <span className="text-muted-foreground">"{finalCreative.headline}"</span>
+                    {variant.overrides?.headline && (
+                      <Badge variant="outline" className="ml-1 text-[10px] px-1">
+                        Modifié
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                {finalCreative?.caption && (
+                  <div className="text-xs">
+                    <span className="font-medium">Description: </span>
+                    <span className="text-muted-foreground">"{finalCreative.caption}"</span>
+                    {variant.overrides?.caption && (
+                      <Badge variant="outline" className="ml-1 text-[10px] px-1">
+                        Modifié
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                {finalCreative?.callToAction && (
+                  <div className="text-xs">
+                    <span className="font-medium">CTA: </span>
+                    <span className="text-muted-foreground">"{finalCreative.callToAction}"</span>
+                    {variant.overrides?.callToAction && (
+                      <Badge variant="outline" className="ml-1 text-[10px] px-1">
+                        Modifié
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                {finalCreative?.mediaFiles && (
+                  <div className="text-xs">
+                    <span className="font-medium">Médias: </span>
+                    <span className="text-muted-foreground">
+                      {finalCreative.mediaFiles.length} fichier(s)
+                    </span>
+                    {variant.overrides?.mediaFiles && (
+                      <Badge variant="outline" className="ml-1 text-[10px] px-1">
+                        Modifié
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {variant.expectedOutcome && (
+                <div className="mt-2 text-xs text-green-600 dark:text-green-400">
+                  🎯 {variant.expectedOutcome}
+                </div>
+              )}
+            </div>
+          );
+        }) || []}
       </div>
     </div>
   );

@@ -155,14 +155,25 @@ export const ABTestElementSchema = z.object({
   description: z.string().optional(),
 });
 
-// Schéma pour les variants A/B enrichi
+// Schéma pour les overrides des variants A/B
+export const ABTestOverridesSchema = z
+  .object({
+    headline: z.string().optional(),
+    caption: z.string().optional(),
+    callToAction: z.string().optional(),
+    mediaFiles: z.array(MediaFileSchema).optional(),
+  })
+  .optional();
+
+// Schéma pour les variants A/B avec système d'overrides
 export const ABTestVariantSchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'Le nom du variant est requis'),
   percentage: z.number().min(0).max(100),
   isControl: z.boolean().default(false),
   description: z.string().optional(),
-  elements: z.array(ABTestElementSchema).min(1, 'Au moins un élément doit être testé'),
+  // Remplace elements par overrides pour éviter la duplication avec StepCreatives
+  overrides: ABTestOverridesSchema,
   expectedOutcome: z.string().optional(),
 });
 
@@ -242,8 +253,23 @@ export type AudienceStepData = z.infer<typeof AudienceStepSchema>;
 export type PlanningStepData = z.infer<typeof PlanningStepSchema>;
 export type UTMParameters = z.infer<typeof UTMParametersSchema>;
 export type ABTestElement = z.infer<typeof ABTestElementSchema>;
+export type ABTestOverrides = z.infer<typeof ABTestOverridesSchema>;
 export type ABTestVariant = z.infer<typeof ABTestVariantSchema>;
 export type TrackingStepData = z.infer<typeof TrackingStepSchema>;
 export type ValidationChecklist = z.infer<typeof ValidationChecklistSchema>;
 export type ValidationStepData = z.infer<typeof ValidationStepSchema>;
 export type WizardData = z.infer<typeof WizardDataSchema>;
+
+// Fonction utilitaire pour fusionner les créatifs de base avec les overrides d'un variant
+export function getFinalCreativeForVariant(
+  baseline: CreativesStepData,
+  variant: ABTestVariant
+): CreativesStepData {
+  return {
+    headline: variant.overrides?.headline || baseline.headline,
+    caption: variant.overrides?.caption || baseline.caption,
+    callToAction: variant.overrides?.callToAction || baseline.callToAction,
+    mediaFiles: variant.overrides?.mediaFiles || baseline.mediaFiles,
+    aiPrompt: baseline.aiPrompt, // AI prompt reste toujours celui de la baseline
+  };
+}
