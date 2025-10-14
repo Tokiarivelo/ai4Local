@@ -5,72 +5,62 @@
 
 import type { MediaFile, AudienceFilter, ABTestVariant } from './components/wizard/validators';
 
-// Segments d'audience prédéfinis
+// Données de simulation pour les segments d'audience
 export const mockAudienceSegments = [
   {
-    id: 'young-professionals',
-    name: 'Jeunes Professionnels',
-    description: '25-35 ans, revenus moyens-élevés, urbains',
-    size: 45000,
+    id: 'young-adults',
+    name: 'Jeunes adultes',
+    description: 'Personnes âgées de 18 à 35 ans, actives sur les réseaux sociaux',
+    size: 25000,
     demographics: {
-      age: '25-35',
-      income: 'Moyen-Élevé',
-      location: 'Zones urbaines',
-      interests: ['Technologie', 'Carrière', 'Lifestyle'],
+      ageRange: '18-35',
+      interests: ['technologie', 'lifestyle', 'voyages'],
+      behavior: ['early-adopters', 'social-active'],
     },
-    isActive: false,
   },
   {
-    id: 'families-madagascar',
-    name: 'Familles Malgaches',
-    description: 'Familles avec enfants, Madagascar',
-    size: 28000,
+    id: 'families',
+    name: 'Familles',
+    description: 'Familles avec enfants, intéressées par les produits familiaux',
+    size: 18000,
     demographics: {
-      age: '30-45',
-      income: 'Moyen',
-      location: 'Madagascar',
-      interests: ['Famille', 'Éducation', 'Santé'],
+      ageRange: '25-45',
+      interests: ['famille', 'éducation', 'loisirs'],
+      behavior: ['value-conscious', 'family-oriented'],
     },
-    isActive: false,
   },
   {
-    id: 'tech-enthusiasts',
-    name: 'Passionnés Tech',
-    description: 'Early adopters, gadgets, innovation',
-    size: 18500,
-    demographics: {
-      age: '20-40',
-      income: 'Élevé',
-      location: 'Global',
-      interests: ['IA', 'Gadgets', 'Innovation', 'Startup'],
-    },
-    isActive: false,
-  },
-  {
-    id: 'local-businesses',
-    name: 'Entreprises Locales',
-    description: 'PME, commerce local, services',
+    id: 'seniors',
+    name: 'Seniors',
+    description: "Personnes de 55 ans et plus, pouvoir d'achat élevé",
     size: 12000,
     demographics: {
-      age: '35-55',
-      income: 'Variable',
-      location: 'Local',
-      interests: ['Business', 'Marketing', 'Croissance'],
+      ageRange: '55+',
+      interests: ['santé', 'voyages', 'loisirs'],
+      behavior: ['brand-loyal', 'quality-focused'],
     },
-    isActive: false,
   },
   {
-    id: 'students-youth',
-    name: 'Étudiants & Jeunes',
-    description: '18-25 ans, étudiants, jeunes actifs',
-    size: 62000,
+    id: 'professionals',
+    name: 'Professionnels',
+    description: 'Cadres et professionnels, revenus élevés',
+    size: 22000,
     demographics: {
-      age: '18-25',
-      income: 'Faible-Moyen',
-      location: 'Universités',
-      interests: ['Études', 'Emploi', 'Loisirs', 'Tech'],
+      ageRange: '28-50',
+      interests: ['business', 'technologie', 'formation'],
+      behavior: ['efficiency-focused', 'career-oriented'],
     },
-    isActive: false,
+  },
+  {
+    id: 'students',
+    name: 'Étudiants',
+    description: 'Étudiants et jeunes diplômés, budget limité',
+    size: 8000,
+    demographics: {
+      ageRange: '18-25',
+      interests: ['éducation', 'divertissement', 'mode'],
+      behavior: ['price-sensitive', 'trend-followers'],
+    },
   },
 ];
 
@@ -217,38 +207,35 @@ export const mockPerformanceData = {
 
 // Exemples de données CSV pour import
 export const mockCSVData = {
-  headers: ['email', 'nom', 'prenom', 'age', 'ville', 'interet'],
+  headers: ['email', 'nom', 'prénom', 'ville', 'age'],
+  stats: {
+    totalRows: 1500,
+    validRows: 1350,
+    errorRows: 150,
+  },
   preview: [
     {
-      email: 'john.doe@example.com',
-      nom: 'Doe',
-      prenom: 'John',
-      age: '28',
-      ville: 'Antananarivo',
-      interet: 'technologie',
+      email: 'jean.dupont@email.com',
+      nom: 'Dupont',
+      prénom: 'Jean',
+      ville: 'Paris',
+      age: '32',
     },
     {
-      email: 'marie.martin@example.com',
+      email: 'marie.martin@email.com',
       nom: 'Martin',
-      prenom: 'Marie',
-      age: '34',
-      ville: 'Tamatave',
-      interet: 'business',
+      prénom: 'Marie',
+      ville: 'Lyon',
+      age: '28',
     },
     {
-      email: 'pierre.durand@example.com',
-      nom: 'Durand',
-      prenom: 'Pierre',
-      age: '29',
-      ville: 'Antsirabe',
-      interet: 'sport',
+      email: 'pierre.bernard@email.com',
+      nom: 'Bernard',
+      prénom: 'Pierre',
+      ville: 'Marseille',
+      age: '45',
     },
   ],
-  stats: {
-    totalRows: 1524,
-    validRows: 1489,
-    invalidRows: 35,
-  },
 };
 
 // Fonction utilitaire pour calculer le reach estimé

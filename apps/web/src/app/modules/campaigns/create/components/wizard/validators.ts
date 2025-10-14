@@ -177,13 +177,44 @@ export const ABTestVariantSchema = z.object({
   expectedOutcome: z.string().optional(),
 });
 
-// Schéma pour l'étape Tracking
+// Schéma pour les pixels de tracking personnalisés
+export const CustomPixelSchema = z.object({
+  name: z.string().min(1, 'Le nom du pixel est requis'),
+  url: z.string().url('URL invalide'),
+  events: z.array(z.enum(['page_view', 'conversion', 'add_to_cart', 'purchase', 'lead'])),
+  enabled: z.boolean().default(true),
+});
+
+// Schéma pour la configuration des pixels de tracking
+export const PixelTrackingSchema = z.object({
+  enabled: z.boolean().default(false),
+  // Pixels des plateformes principales
+  facebookPixelId: z.string().optional(),
+  googleAnalyticsId: z.string().optional(),
+  googleAdsConversionId: z.string().optional(),
+  linkedInPartnerId: z.string().optional(),
+  tiktokPixelCode: z.string().optional(),
+  // Pixels personnalisés
+  customPixels: z.array(CustomPixelSchema).optional(),
+  // Conformité RGPD
+  requireConsent: z.boolean().default(true),
+  consentCategories: z
+    .object({
+      analytics: z.boolean().default(false),
+      advertising: z.boolean().default(false),
+      personalization: z.boolean().default(false),
+    })
+    .optional(),
+});
+
+// Schéma pour l'étape Tracking (mis à jour avec pixel tracking)
 export const TrackingStepSchema = z
   .object({
     utmParameters: UTMParametersSchema,
     generatedUrl: z.string().optional(),
     abTestEnabled: z.boolean().default(false),
     abTestVariants: z.array(ABTestVariantSchema).optional(),
+    pixelTracking: PixelTrackingSchema.optional(),
   })
   .refine(
     (data) => {
@@ -255,6 +286,8 @@ export type UTMParameters = z.infer<typeof UTMParametersSchema>;
 export type ABTestElement = z.infer<typeof ABTestElementSchema>;
 export type ABTestOverrides = z.infer<typeof ABTestOverridesSchema>;
 export type ABTestVariant = z.infer<typeof ABTestVariantSchema>;
+export type CustomPixel = z.infer<typeof CustomPixelSchema>;
+export type PixelTracking = z.infer<typeof PixelTrackingSchema>;
 export type TrackingStepData = z.infer<typeof TrackingStepSchema>;
 export type ValidationChecklist = z.infer<typeof ValidationChecklistSchema>;
 export type ValidationStepData = z.infer<typeof ValidationStepSchema>;

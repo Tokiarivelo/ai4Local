@@ -1,13 +1,11 @@
-/**
- * Étape Informations de base - Nom, objectif et canaux
- * Gère la configuration des informations fondamentales de la campagne
- */
-
 'use client';
 
 import React from 'react';
-import { useCampaignStore } from '../../stores/campaignStore';
-import { BasicInfoForm } from './BasicInfoStep/BasicInfoForm';
+import { useCampaignStore } from '../../../stores/campaignStore';
+import { BasicInfoForm } from './BasicInfoForm';
+import { ObjectiveSelector } from './ObjectiveSelector';
+import { ChannelSelector } from './ChannelSelector';
+import { RecommendationsCard } from './RecommendationsCard';
 
 interface BasicInfoStepProps {
   onComplete?: () => void;
