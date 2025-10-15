@@ -1,0 +1,1 @@
+Now give me a prompt for dashboard/campaigns/templates, and tell it to follow the same structure as the realtime code. Always following good practice, well separated components and logics, and use zustand for the global state and reusable files, and modular
