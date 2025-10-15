@@ -34,20 +34,27 @@ export function CreativesForm({ initialData, onSubmit, onValidationChange }: Cre
       headline: initialData?.headline || '',
       caption: initialData?.caption || '',
       callToAction: initialData?.callToAction || '',
-      mediaFiles: mediaFiles,
+      mediaFiles: initialData?.mediaFiles || [],
     },
   });
 
   const {
     handleSubmit,
-    formState: { isValid },
+    formState: { errors, isValid: isFormValid },
+    formState,
+
     watch,
   } = form;
 
-  // Validation globale
-  const isFormValid = React.useMemo(() => {
-    return isValid && mediaFiles.length > 0;
-  }, [isValid, mediaFiles.length]);
+  console.log('formState :>> ', formState);
+  console.log('mediaFiles :>> ', mediaFiles);
+  console.log('isValid :>> ', isFormValid);
+  console.log('errors :>> ', errors);
+
+  React.useEffect(() => {
+    // Set mediafile to formstate
+    form.setValue('mediaFiles', mediaFiles);
+  }, [mediaFiles]);
 
   React.useEffect(() => {
     onValidationChange(isFormValid);

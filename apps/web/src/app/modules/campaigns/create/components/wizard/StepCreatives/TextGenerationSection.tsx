@@ -103,7 +103,7 @@ export function TextGenerationSection({ form, isGenerating }: TextGenerationSect
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(watch('headline'))}
+                  onClick={() => copyToClipboard(watch('headline') ?? '')}
                 >
                   <Copy className="h-3 w-3" />
                 </Button>
@@ -146,7 +146,7 @@ export function TextGenerationSection({ form, isGenerating }: TextGenerationSect
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(watch('caption'))}
+                  onClick={() => copyToClipboard(watch('caption') ?? '')}
                 >
                   <Copy className="h-3 w-3" />
                 </Button>
@@ -187,7 +187,7 @@ export function TextGenerationSection({ form, isGenerating }: TextGenerationSect
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(watch('callToAction'))}
+                  onClick={() => copyToClipboard(watch('callToAction') ?? '')}
                 >
                   <Copy className="h-3 w-3" />
                 </Button>

@@ -8,13 +8,12 @@ import { Alert, AlertDescription } from '@/app/modules/ui/alert';
 import { useCampaignStore } from '../../../stores/campaignStore';
 
 export function ValidationChecklist() {
-  const campaignData = useCampaignStore((state) => ({
-    basicInfo: state.basicInfo,
-    creatives: state.creatives,
-    audience: state.audience,
-    planning: state.planning,
-    tracking: state.tracking,
-  }));
+  // Get each field separately for stable references
+  const basicInfo = useCampaignStore((state) => state.basicInfo);
+  const creatives = useCampaignStore((state) => state.creatives);
+  const audience = useCampaignStore((state) => state.audience);
+  const planning = useCampaignStore((state) => state.planning);
+  const tracking = useCampaignStore((state) => state.tracking);
 
   const [checklist, setChecklist] = useState({
     creativesReviewed: false,
@@ -39,30 +38,28 @@ export function ValidationChecklist() {
       label: "J'ai vérifié et approuvé tous les éléments créatifs",
       description: 'Images, vidéos, textes et call-to-action sont corrects',
       critical: true,
-      autoCheck: Boolean(
-        campaignData.creatives?.mediaFiles?.length && campaignData.creatives?.headline
-      ),
+      autoCheck: Boolean(creatives?.mediaFiles?.length && creatives?.headline),
     },
     {
       id: 'audienceConfirmed',
       label: "Le ciblage d'audience a été confirmé",
       description: 'Segments sélectionnés et reach estimé vérifié',
       critical: true,
-      autoCheck: Boolean(campaignData.audience?.selectedSegments?.length),
+      autoCheck: Boolean(audience?.selectedSegments?.length),
     },
     {
       id: 'budgetApproved',
       label: 'Le budget et la planification sont approuvés',
       description: 'Montant, dates et répartition validés',
       critical: true,
-      autoCheck: Boolean(campaignData.planning?.budget && campaignData.planning?.startDate),
+      autoCheck: Boolean(planning?.budget && planning?.startDate),
     },
     {
       id: 'trackingSetup',
       label: 'Les paramètres de tracking sont configurés',
       description: 'UTM, pixels et A/B testing configurés si nécessaire',
       critical: true,
-      autoCheck: Boolean(campaignData.tracking?.utmParameters?.source),
+      autoCheck: Boolean(tracking?.utmParameters?.source),
     },
     {
       id: 'legalCompliance',

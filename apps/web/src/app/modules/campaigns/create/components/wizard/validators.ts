@@ -83,11 +83,13 @@ export const BasicInfoStepSchema = z.object({
 // Schéma pour les fichiers média
 export const MediaFileSchema = z.object({
   id: z.string(),
-  type: z.enum(['image', 'video']),
+  type: z.enum(['image', 'video', 'file']),
   url: z.string().url(),
   name: z.string(),
   size: z.number().positive(),
   preview: z.string().optional(),
+  uploadedAt: z.date().optional(),
+  generated: z.boolean().default(false).optional(), // Indique si le média a été généré par IA
 });
 
 // Schéma pour l'étape Créatifs
@@ -187,51 +189,35 @@ export const CustomPixelSchema = z.object({
 
 // Schéma pour la configuration des pixels de tracking
 export const PixelTrackingSchema = z.object({
-  enabled: z.boolean().default(false),
-  // Pixels des plateformes principales
-  facebookPixelId: z.string().optional(),
-  googleAnalyticsId: z.string().optional(),
-  googleAdsConversionId: z.string().optional(),
-  linkedInPartnerId: z.string().optional(),
-  tiktokPixelCode: z.string().optional(),
-  // Pixels personnalisés
-  customPixels: z.array(CustomPixelSchema).optional(),
-  // Conformité RGPD
-  requireConsent: z.boolean().default(true),
-  consentCategories: z
-    .object({
-      analytics: z.boolean().default(false),
-      advertising: z.boolean().default(false),
-      personalization: z.boolean().default(false),
-    })
+  facebookPixel: z.string().optional(),
+  googleAnalytics: z.string().optional(),
+  customPixels: z
+    .array(
+      z.object({
+        name: z.string(),
+        id: z.string(),
+        type: z.enum(['facebook', 'google', 'custom']),
+        description: z.string().optional(),
+      })
+    )
     .optional(),
+  enabled: z.boolean().default(false),
 });
 
 // Schéma pour l'étape Tracking (mis à jour avec pixel tracking)
-export const TrackingStepSchema = z
-  .object({
-    utmParameters: UTMParametersSchema,
-    generatedUrl: z.string().optional(),
-    abTestEnabled: z.boolean().default(false),
-    abTestVariants: z.array(ABTestVariantSchema).optional(),
-    pixelTracking: PixelTrackingSchema.optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.abTestEnabled && data.abTestVariants) {
-        const totalPercentage = data.abTestVariants.reduce(
-          (sum, variant) => sum + variant.percentage,
-          0
-        );
-        return totalPercentage === 100;
-      }
-      return true;
-    },
-    {
-      message: 'Le total des pourcentages des variants doit être égal à 100%',
-      path: ['abTestVariants'],
-    }
-  );
+export const TrackingStepSchema = z.object({
+  utmParameters: z.object({
+    source: z.string().min(1, 'La source UTM est requise'),
+    medium: z.string().min(1, 'Le medium UTM est requis'),
+    campaign: z.string().min(1, 'Le nom de campagne UTM est requis'),
+    term: z.string().optional(),
+    content: z.string().optional(),
+  }),
+  generatedUrl: z.string().optional(),
+  abTestEnabled: z.boolean().default(false),
+  abTestVariants: z.array(ABTestVariantSchema).optional(),
+  pixelTracking: PixelTrackingSchema.optional(),
+});
 
 // Schéma pour la checklist de validation
 export const ValidationChecklistSchema = z.object({
@@ -286,7 +272,12 @@ export type UTMParameters = z.infer<typeof UTMParametersSchema>;
 export type ABTestElement = z.infer<typeof ABTestElementSchema>;
 export type ABTestOverrides = z.infer<typeof ABTestOverridesSchema>;
 export type ABTestVariant = z.infer<typeof ABTestVariantSchema>;
-export type CustomPixel = z.infer<typeof CustomPixelSchema>;
+export type CustomPixel = {
+  type: 'custom' | 'facebook' | 'google';
+  id: string;
+  name: string;
+  description?: string;
+};
 export type PixelTracking = z.infer<typeof PixelTrackingSchema>;
 export type TrackingStepData = z.infer<typeof TrackingStepSchema>;
 export type ValidationChecklist = z.infer<typeof ValidationChecklistSchema>;
