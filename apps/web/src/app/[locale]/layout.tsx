@@ -5,6 +5,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n/routing';
 import '../globals.css';
+import { Toaster } from '../modules/ui/toaster';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -45,5 +46,10 @@ export default async function LocaleLayout({
 
   const messages = await getMessages();
 
-  return <div> {children}</div>;
+  return (
+    <div>
+      {children}
+      <Toaster />
+    </div>
+  );
 }

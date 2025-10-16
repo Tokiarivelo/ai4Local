@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import {
   FormControl,
@@ -38,6 +38,14 @@ interface TemplateFormFieldsProps {
   form: UseFormReturn<TemplateFormData>;
 }
 
+interface MediaFile {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  name: string;
+  size: number;
+}
+
 const CAMPAIGN_TYPES: TemplateCategory[] = [
   'promotion',
   'newsletter',
@@ -51,9 +59,14 @@ const CAMPAIGN_TYPES: TemplateCategory[] = [
 
 export function TemplateFormFields({ form }: TemplateFormFieldsProps) {
   const [tagInput, setTagInput] = useState('');
+  const [isGeneratingMedia, setIsGeneratingMedia] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+
   const tags = form.watch('tags') || [];
   const templateName = form.watch('name');
   const templateCategory = form.watch('category');
+  const headline = form.watch('structure.creatives.headline');
+  const caption = form.watch('structure.creatives.caption');
 
   const context = `${templateName} - ${getCategoryLabel(templateCategory)}`;
 
@@ -69,6 +82,54 @@ export function TemplateFormFields({ form }: TemplateFormFieldsProps) {
       'tags',
       tags.filter((t) => t !== tag)
     );
+  };
+
+  /**
+   * Génération IA de médias basée sur le contexte de la campagne
+   */
+  const handleGenerateWithAI = async () => {
+    setIsGeneratingMedia(true);
+
+    try {
+      // Construction du prompt enrichi avec le contexte
+      const enrichedPrompt =
+        aiPrompt ||
+        `Génère une image pour une campagne ${getCategoryLabel(templateCategory)}: ${
+          headline || templateName
+        }. ${caption || ''}`;
+
+      // TODO: Appel API GraphQL/REST vers le service de génération d'images
+      // Exemple avec mutation GraphQL
+      // const { data } = await generateImageMutation({
+      //   variables: {
+      //     prompt: enrichedPrompt,
+      //     style: 'professional',
+      //     size: '1024x1024',
+      //   }
+      // });
+
+      // Simulation pour démonstration (à remplacer par l'appel réel)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const generatedMedia: MediaFile = {
+        id: `ai-gen-${Date.now()}`,
+        type: 'image',
+        url: '/api/placeholder-image', // Remplacer par data.generateImage.url
+        name: `ai-generated-${Date.now()}.png`,
+        size: 1024000,
+      };
+
+      // Ajouter aux médias existants
+      const currentMedia = form.getValues('structure.creatives.mediaFiles') || [];
+      form.setValue('structure.creatives.mediaFiles', [...currentMedia, generatedMedia]);
+
+      setAiPrompt('');
+    } catch (error) {
+      console.error('Erreur génération IA:', error);
+      // TODO: Afficher toast d'erreur
+    } finally {
+      setIsGeneratingMedia(false);
+    }
   };
 
   return (
@@ -235,13 +296,62 @@ export function TemplateFormFields({ form }: TemplateFormFieldsProps) {
               )}
             />
 
-            {/* Media Files Upload */}
+            {/* Media Files Upload avec génération IA */}
             <FormField
               control={form.control}
               name="structure.creatives.mediaFiles"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Médias (Images/Vidéos)</FormLabel>
+
+                  {/* Zone de génération IA */}
+                  <div className="mb-4 p-4 border border-dashed rounded-lg bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
+                    <div className="flex items-start gap-3 mb-3">
+                      <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-sm mb-1">Générer avec l'IA</h4>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Décrivez l'image souhaitée ou laissez l'IA suggérer basé sur votre
+                          campagne
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Ex: Une image moderne et colorée représentant..."
+                        value={aiPrompt}
+                        onChange={(e) => setAiPrompt(e.target.value)}
+                        disabled={isGeneratingMedia}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleGenerateWithAI}
+                        disabled={isGeneratingMedia || !templateName}
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                      >
+                        {isGeneratingMedia ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                            Génération...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Générer
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    {!templateName && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                        💡 Remplissez d'abord le nom et le titre pour une meilleure génération
+                      </p>
+                    )}
+                  </div>
+
                   <FormControl>
                     <FileUploadZone
                       config={DEFAULT_IMAGE_CONFIG}
@@ -256,20 +366,20 @@ export function TemplateFormFields({ form }: TemplateFormFieldsProps) {
                           }))
                         );
                       }}
-                      existingFiles={
-                        field.value?.map((f: any) => ({
-                          id: f.id || `file-${Date.now()}`,
-                          name: f.name,
-                          size: f.size || 0,
-                          type: f.type === 'image' ? 'image/jpeg' : 'video/mp4',
-                          url: f.url || '',
-                          uploadedAt: new Date(),
-                        })) || []
-                      }
+                      // existingFiles={
+                      //   field.value?.map((f) => ({
+                      //     id: f.id ? f.id : `file-${Date.now()}`,
+                      //     name: f.name,
+                      //     size: typeof f.size === 'number' ? f.size : 0,
+                      //     type: f.type === 'image' ? 'image/jpeg' : 'video/mp4',
+                      //     url: f.url ? f.url : '',
+                      //     uploadedAt: new Date(),
+                      //   })) || []
+                      // }
                     />
                   </FormControl>
                   <FormDescription>
-                    Téléchargez des images ou vidéos pour votre template (max 10 fichiers)
+                    Téléchargez des images/vidéos ou générez-les avec l'IA (max 10 fichiers)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -300,9 +410,7 @@ export function TemplateFormFields({ form }: TemplateFormFieldsProps) {
                       }}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Budget recommandé pour ce type de campagne
-                  </FormDescription>
+                  <FormDescription>Budget recommandé pour ce type de campagne</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -319,11 +427,7 @@ export function TemplateFormFields({ form }: TemplateFormFieldsProps) {
                       <Input
                         type="date"
                         {...field}
-                        value={
-                          field.value
-                            ? new Date(field.value).toISOString().split('T')[0]
-                            : ''
-                        }
+                        value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
                         onChange={(e) => {
                           field.onChange(e.target.value ? new Date(e.target.value) : undefined);
                         }}
@@ -344,11 +448,7 @@ export function TemplateFormFields({ form }: TemplateFormFieldsProps) {
                       <Input
                         type="date"
                         {...field}
-                        value={
-                          field.value
-                            ? new Date(field.value).toISOString().split('T')[0]
-                            : ''
-                        }
+                        value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
                         onChange={(e) => {
                           field.onChange(e.target.value ? new Date(e.target.value) : undefined);
                         }}

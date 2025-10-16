@@ -103,12 +103,12 @@ export function TemplateDetails({ open, onOpenChange }: TemplateDetailsProps) {
                 ))}
               </div>
             </div>
-            <button
+            {/* <button
               onClick={handleClose}
               className="p-2 hover:bg-muted rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
-            </button>
+            </button> */}
           </div>
         </DialogHeader>
 
