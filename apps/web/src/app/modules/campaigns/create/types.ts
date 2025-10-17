@@ -37,6 +37,17 @@ export type CampaignType =
   | 'product_launch'
   | 'seasonal';
 
+export type CommunicationTone =
+  | 'professional'
+  | 'friendly'
+  | 'casual'
+  | 'urgent'
+  | 'inspirational'
+  | 'humorous'
+  | 'educational'
+  | 'formal'
+  | 'conversational';
+
 export type BudgetType = 'daily' | 'lifetime';
 export type PacingStrategy = 'standard' | 'accelerated';
 export type Currency = 'EUR' | 'USD' | 'MGA';

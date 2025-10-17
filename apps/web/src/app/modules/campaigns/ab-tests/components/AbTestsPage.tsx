@@ -35,8 +35,6 @@ export function AbTestsPage() {
   const isLoading = useIsLoading();
   const filters = useFilters();
 
-  console.log('tests :>> ', tests);
-
   const {
     fetchTests,
     createDraft,

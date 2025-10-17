@@ -25,6 +25,8 @@
       "@/components/*": ["src/app/modules/*"],
       "@/lib/*": ["./src/lib/*"],
       "@/hooks/*": ["./src/hooks/*"],
+      "@/stores/*": ["./src/stores/*"],
+      "@/ui/*": ["./src/app/modules/ui/*"],
       "@/utils/*": ["./src/utils/*"],
       "@ai4local/shared": ["../../shared/src"],
       "@ai4local/shared/*": ["../../shared/src/*"]
