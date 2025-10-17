@@ -80,3 +80,7 @@ Cargo.lock
 
 # n8n
 n8n/.n8n/
+
+# turbo
+.turbo
+turbo

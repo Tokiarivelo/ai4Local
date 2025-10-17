@@ -70,3 +70,115 @@ BONNES PRATIQUES (rappel)
 -Use context/provider for filters & selected rows.
 -Exports index.ts pour chaque dossier.
 -Commentaire en haut de chaque fichier résumant responsabilité.
+
+---
+
+Génère les 5 étapes interactives du flux de création de campagne pour AI4Local :
+
+- Créatifs : Images, vidéos, textes, génération IA
+- Audience : Ciblage et segments
+- Planning : Budget et calendrier
+- Tracking : UTM et A/B tests
+- Validation : Vérification finale avant publication
+
+Contexte :
+Ce module appartient à la page `Dashboard > Campaigns > Create` située dans `app/modules/campaigns/create/cpmponents/wizard`.
+Suivre strictement la même structure, typage, bonnes pratiques et code style que la page Realtime.
+
+## 🧩 EXIGENCES GÉNÉRALES
+
+- **UI Framework :** Next.js 15 + TypeScript + TailwindCSS + shadcn/ui.
+- **Dark / Light Mode** complet (via CSS vars + classes `dark:`).
+- **Mobile-first** responsive layout (sm, md, lg).
+- **Utilisation de composants shadcn/ui** (Card, Tabs, Input, Button, Slider, Switch, Dialog, Select, Calendar, Avatar, Badge, Alert, etc.).
+- **Typage fort** (`zod` + `react-hook-form` + `zodResolver`).
+- **Architecture modulaire et réutilisable** (chaque étape = composant isolé et typé).
+- **Accessibilité (ARIA)** et focus visibles.
+- **Interactions fluides et animations légères (framer-motion)**.
+- **Mock data fournie** (pour preview des images, segments, calendriers, etc.).
+- **Support IA intégré** (génération de texte/image via mock d’API `aiGenerator()`).
+
+## ⚙️ DESCRIPTION DÉTAILLÉE DES ÉTAPES
+
+1️⃣ StepCreatives.tsx — Créatifs
+
+- Sous-sections :
+  - Upload image/vidéo (via `shadcn/ui` `FileUploader` ou `Dropzone` custom).
+  - Génération IA de texte ou visuel (`aiGenerator(prompt)` dans `utils/ai-generator.ts`).
+  - Champs : `headline`, `caption`, `mediaFiles[]`.
+- Features :
+  - Preview visuelle du post (mobile + desktop mock).
+  - Option “Générer par IA” → ouvre un `Dialog` shadcn avec prompt input et bouton “Générer”.
+  - Gestion drag/drop réordonner les visuels.
+  - Validation zod : au moins 1 média + titre non vide.
+
+---
+
+2️⃣ StepAudience.tsx — Ciblage et segments
+
+- UI :
+  - Segments prédéfinis (cartes avec `shadcn/ui` `Card` + `Switch` “Activer”).
+  - Création manuelle : filtres “Âge”, “Localisation”, “Centre d’intérêt”.
+  - Import CSV (mock, affiche prévisualisation).
+- Logic :
+  - Mock data importée depuis `campaign-create.mock.ts` (segments existants).
+  - Validation zod : au moins un segment sélectionné.
+  - Bouton “Enregistrer le segment” → animation succès + toast.
+- Composants : `SegmentCard`, `SegmentFilters`, `CsvPreviewTable`.
+
+---
+
+3️⃣ StepPlanning.tsx — Budget et calendrier
+
+- UI :
+  - Composants : `DatePicker` (shadcn), `Slider` pour budget, `Select` pour devise, `Switch` “Budget quotidien”.
+  - Affiche calcul estimé du reach (mock calcul).
+- Logic :
+  - Validation : `startDate < endDate`, `budget > 0`.
+  - Interaction : modif budget → recalcul reach instantané.
+  - Mock formule : `reach = budget * 0.45 * random(1.1,1.3)`.
+
+---
+
+4️⃣ StepTracking.tsx — UTM & A/B Tests
+
+- UI :
+  - Section “UTM Builder” : inputs pour source, medium, campaign, content.
+  - Bouton “Générer lien” (affiche preview : `https://ai4local.com/?utm_source=...`).
+  - Section “A/B Test” : toggle activé → table pour variants avec %
+  - Graphique petit (bar chart `shadcn/ui` composable).
+- Logic :
+  - Validation zod : champs non vides si A/B actif, pourcentage total = 100%.
+  - Mock preview chart : CTR variant A vs B.
+
+5️⃣ StepValidation.tsx — Vérification finale
+
+- UI :
+  - Récapitulatif de toutes les étapes :
+    - Créatifs (miniature + texte)
+    - Audience (segments actifs)
+    - Planning (dates, budget, reach estimé)
+    - Tracking (UTM + variants).
+  - Check-list shadcn `Checkbox` : “Visuel conforme”, “Budget validé”, “Audience OK”, etc.
+  - Boutons : “Sauvegarder le brouillon”, “Publier maintenant”.
+- Logic :
+  - Validation : tous les items cochés avant publication.
+  - Animation succès (`Dialog` ou `Toast` shadcn) après publication mock.
+    🧠 TECHNIQUES ET BONNES PRATIQUES
+    -Composants petits et réutilisables.
+    -Export index.ts dans chaque sous-dossier.
+    -Typage zod et réutilisation entre étapes.
+    -useCampaignCreateContext() pour stocker l’état global du wizard.
+    -State persistant (draft auto-save).
+    -Test unitaire exemple pour StepCreatives (upload + validation).
+    -Responsive sur tous les breakpoints.
+    -framer-motion pour transitions entre étapes.
+    -Commentaires clairs en haut de chaque fichier.
+    📄 LIVRABLES ATTENDUS
+- Fichiers TSX/TS complets dans l’arborescence correspondante.
+  -README.md (comment intégrer et connecter à API réelle).
+  -validators.ts (Zod schemas pour chaque étape).
+  -StepsExample.tsx (monte le wizard complet avec mocks).
+  -Test exemple StepCreatives.test.tsx.
+  -Code propre, lisible, typé, prêt à refactor.
+  -Suivre le même design et logique de la page Realtime.
